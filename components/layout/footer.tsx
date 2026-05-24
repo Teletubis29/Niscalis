@@ -1,10 +1,21 @@
+"use client";
+
+import { usePathname } from "next/navigation";
 import Link from "next/link";
-import { Facebook, Twitter, Instagram, Mail, AtSign } from "lucide-react";
+import { FaFacebookF, FaInstagram, FaTiktok } from "react-icons/fa";
+import { BsThreads, BsEnvelope } from "react-icons/bs";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import Logo from "@/components/logo";
 
 export default function Footer() {
+  const pathname = usePathname();
+
+  // Don't render footer on admin pages
+  if (pathname.startsWith("/admin")) {
+    return null;
+  }
+
   return (
     <footer className="border-t">
       <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
@@ -32,20 +43,22 @@ export default function Footer() {
             </div>
 
             {/* Social Links */}
+
             <div className="flex space-x-4">
-              <a href="#" className="hover:text-primary text-gray-400 transition-colors">
-                <Facebook className="h-5 w-5" />
+              <a
+                href="https://www.instagram.com/niscalis.official/"
+                className="hover:text-primary text-gray-400 transition-colors">
+                <FaInstagram className="h-5 w-5" />
               </a>
               <a href="#" className="hover:text-primary text-gray-400 transition-colors">
-                <Twitter className="h-5 w-5" />
+                <FaTiktok className="h-5 w-5" />
               </a>
-               <a href="#" className="hover:text-primary text-gray-400 transition-colors">
-                <AtSign className="h-5 w-5" />
+              <a href="#" className="hover:text-primary text-gray-400 transition-colors">
+                <BsThreads className="h-5 w-5" />
               </a>
-              <a href="https://www.instagram.com/niscalis.official/" className="hover:text-primary text-gray-400 transition-colors">
-                <Instagram className="h-5 w-5" />
+              <a href="#" className="hover:text-primary text-gray-400 transition-colors">
+                <FaFacebookF className="h-5 w-5" />
               </a>
-             
             </div>
           </div>
 

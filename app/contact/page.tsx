@@ -63,11 +63,11 @@ export default function ContactPage() {
                 <div>
                   <h3 className="mb-1 font-semibold text-gray-900">Address</h3>
                   <p className="text-muted-foreground">
-                    123 Commerce Street
+                    Osaka Riverview Apartment
                     <br />
-                    Business City, BC 12345
+                    Jl. Raya Boulevard Osaka PIK 2, Salembaran, Kec. Kosambi, Kabupaten Tangerang, Banten 15214
                     <br />
-                    United States
+                    Indonesia
                   </p>
                 </div>
               </div>
@@ -79,9 +79,7 @@ export default function ContactPage() {
                 <div>
                   <h3 className="mb-1 font-semibold text-gray-900">Phone</h3>
                   <p className="text-muted-foreground">
-                    Main: 1-800-STORE-01
-                    <br />
-                    Support: 1-800-STORE-02
+                    Support: 08xxxxxxxx
                   </p>
                 </div>
               </div>
@@ -93,9 +91,7 @@ export default function ContactPage() {
                 <div>
                   <h3 className="mb-1 font-semibold text-gray-900">Email</h3>
                   <p className="text-muted-foreground">
-                    General: info@store.com
-                    <br />
-                    Support: support@store.com
+                    Support: niscalis.official@gmail.com  
                   </p>
                 </div>
               </div>
@@ -205,44 +201,6 @@ export default function ContactPage() {
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
-                <div>
-                  <label htmlFor="subject" className="mb-2 block text-sm font-medium text-gray-700">
-                    Subject *
-                  </label>
-                  <select
-                    id="subject"
-                    value={data.subject || ""}
-                    onChange={(e) => setValue("subject", e.target.value)}
-                    className={`focus:ring-primary w-full rounded-lg border px-3 py-2 focus:border-transparent focus:ring-2 ${
-                      errors.subject ? "border-red-500" : "border-gray-300"
-                    }`}>
-                    <option value="">Select a subject</option>
-                    <option value="general">General Inquiry</option>
-                    <option value="order">Order Support</option>
-                    <option value="returns">Returns & Exchanges</option>
-                    <option value="technical">Technical Support</option>
-                    <option value="billing">Billing Question</option>
-                    <option value="partnership">Partnership Inquiry</option>
-                  </select>
-                  {errors.subject && <p className="mt-1 text-sm text-red-600">{errors.subject}</p>}
-                </div>
-
-                <div>
-                  <label
-                    htmlFor="orderNumber"
-                    className="mb-2 block text-sm font-medium text-gray-700">
-                    Order Number (if applicable)
-                  </label>
-                  <Input
-                    id="orderNumber"
-                    type="text"
-                    placeholder="#12345"
-                    value={data.orderNumber || ""}
-                    onChange={(e) => setValue("orderNumber", e.target.value)}
-                  />
-                </div>
-              </div>
 
               <div>
                 <label htmlFor="message" className="mb-2 block text-sm font-medium text-gray-700">
@@ -289,13 +247,13 @@ export default function ContactPage() {
             <div className="text-center">
               <MapPin className="mx-auto mb-4 h-16 w-16 text-gray-400" />
               <h3 className="text-muted-foreground mb-2 text-lg font-semibold">Interactive Map</h3>
-              <p className="text-gray-500">123 Commerce Street, Business City, BC 12345</p>
+              <p className="text-gray-500">Jl. Raya Boulevard Osaka PIK 2, Salembaran, Kec. Kosambi, Kabupaten Tangerang, Banten 15214</p>
               <Button
                 variant="outline"
                 className="mt-4 bg-white"
                 onClick={() =>
                   window.open(
-                    "https://maps.google.com/?q=123+Commerce+Street+Business+City+BC+12345",
+                    "https://www.google.com/maps/place/Osaka+Riverview+Apartment/@-6.0580861,106.6785316,16.8z/data=!4m6!3m5!1s0x2e6a0574f2e0a831:0x7393c86ad49b95!8m2!3d-6.057847!4d106.6785641!16s%2Fg%2F11g1mwkpcy?entry=ttu&g_ep=EgoyMDI2MDUyMC4wIKXMDSoASAFQAw%3D%3D",
                     "_blank"
                   )
                 }>

@@ -189,7 +189,7 @@ export default function CheckoutPage() {
                     <h3 className="font-medium text-gray-900">{item.name}</h3>
                     <p className="text-muted-foreground text-sm">Qty: {item.quantity}</p>
                   </div>
-                  <p className="font-medium">${(item.price * item.quantity).toFixed(2)}</p>
+                  <p className="font-medium">{formatRupiah(item.price * item.quantity)}</p>
                 </div>
               ))}
             </div>
@@ -197,19 +197,19 @@ export default function CheckoutPage() {
             <div className="space-y-2 border-t border-gray-200 pt-4">
               <div className="flex justify-between">
                 <span>Subtotal</span>
-                <span>${subtotal.toFixed(2)}</span>
+                <span>{formatRupiah(subtotal)}</span>
               </div>
               <div className="flex justify-between">
                 <span>Shipping</span>
-                <span>{shipping === 0 ? "Free" : `$${shipping.toFixed(2)}`}</span>
+                <span>{shipping === 0 ? "Free" : formatRupiah(shipping)}</span>
               </div>
               <div className="flex justify-between">
                 <span>Tax</span>
-                <span>${tax.toFixed(2)}</span>
+                <span>{formatRupiah(tax)}</span>
               </div>
               <div className="flex justify-between border-t border-gray-200 pt-2 text-lg font-semibold">
                 <span>Total</span>
-                <span>${total.toFixed(2)}</span>
+                <span>{formatRupiah(total)}</span>
               </div>
             </div>
           </div>

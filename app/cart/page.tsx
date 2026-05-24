@@ -4,6 +4,7 @@ import { Minus, Plus, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useCartStore } from "@/stores/cartStore";
 import Link from "next/link";
+import { formatRupiah } from "@/lib/utils";
 
 export default function CartPage() {
   const { items, updateQuantity, removeItem, getTotal } = useCartStore();
@@ -38,7 +39,7 @@ export default function CartPage() {
 
               <div className="flex-1">
                 <h3 className="font-semibold text-gray-900">{item.name}</h3>
-                <p className="text-muted-foreground">${item.price.toFixed(2)}</p>
+                <p className="text-muted-foreground">{formatRupiah(item.price)}</p>
               </div>
 
               <div className="flex items-center space-x-3">
@@ -57,7 +58,7 @@ export default function CartPage() {
 
               <div className="text-right">
                 <p className="font-semibold text-gray-900">
-                  ${(item.price * item.quantity).toFixed(2)}
+                  {formatRupiah(item.price * item.quantity)}
                 </p>
               </div>
 
@@ -73,7 +74,7 @@ export default function CartPage() {
         <div className="bg-gray-50 p-6">
           <div className="mb-4 flex items-center justify-between">
             <span className="text-lg font-semibold">Total:</span>
-            <span className="text-primary text-2xl font-bold">${getTotal().toFixed(2)}</span>
+            <span className="text-primary text-2xl font-bold">{formatRupiah(getTotal())}</span>
           </div>
 
           <div className="flex flex-col gap-4 sm:flex-row">

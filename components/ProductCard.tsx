@@ -5,6 +5,7 @@ import { Star, Heart } from "lucide-react";
 import { useCartStore } from "@/stores/cartStore";
 import type { Product } from "@/lib/schemas";
 import { Button } from "@/components/ui/button";
+import { formatRupiah } from "@/lib/utils";
 
 interface ProductCardProps {
   product: Product;
@@ -66,10 +67,10 @@ export default function ProductCard({ product }: ProductCardProps) {
 
         <div className="mb-4 flex items-center justify-between">
           <div className="flex items-center space-x-2">
-            <span className="text-lg font-bold text-gray-900">${product.price.toFixed(2)}</span>
+            <span className="text-lg font-bold text-gray-900">{formatRupiah(product.price)}</span>
             {product.originalPrice && (
               <span className="text-sm text-gray-500 line-through">
-                ${product.originalPrice.toFixed(2)}
+                {formatRupiah(product.originalPrice)}
               </span>
             )}
           </div>

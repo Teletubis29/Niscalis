@@ -3,19 +3,41 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { useAuthStore } from "@/stores/authStore";
 import { useForm } from "@/hooks/useForm";
 import { SignUpSchema, type SignUpForm } from "@/lib/schemas";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
+import { toast } from "sonner";
 
 export default function SignUpPage() {
   const router = useRouter();
-  const { signup, isLoading } = useAuthStore();
   const { data, errors, isSubmitting, setValue, handleSubmit } = useForm(SignUpSchema);
+  const [apiError, setApiError] = useState<string>("");
 
   const onSubmit = async (formData: SignUpForm) => {
-    await signup(formData.email, formData.password, formData.firstName, formData.lastName);
-    router.push("/");
+    setApiError("");
+    try {
+      const response = await fetch("/api/auth/signup", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        setApiError(result.error || "Sign up failed");
+        toast.error(result.error || "Sign up failed");
+        return;
+      }
+
+      toast.success("Account created successfully!");
+      router.push("/auth/signin");
+    } catch (error) {
+      const errorMsg = "An error occurred during sign up";
+      setApiError(errorMsg);
+      toast.error(errorMsg);
+    }
   };
 
   return (
@@ -116,8 +138,10 @@ export default function SignUpPage() {
             </label>
           </div>
 
-          <Button type="submit" className="w-full" size="lg" disabled={isSubmitting || isLoading}>
-            {isSubmitting || isLoading ? "Creating account..." : "Create account"}
+          {apiError && <p className="text-sm text-red-600">{apiError}</p>}
+
+          <Button type="submit" className="w-full" size="lg" disabled={isSubmitting}>
+            {isSubmitting ? "Creating account..." : "Create account"}
           </Button>
         </form>
       </div>

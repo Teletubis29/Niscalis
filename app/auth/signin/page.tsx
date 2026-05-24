@@ -3,19 +3,43 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { useAuthStore } from "@/stores/authStore";
 import { useForm } from "@/hooks/useForm";
 import { SignInSchema, type SignInForm } from "@/lib/schemas";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
+import { toast } from "sonner";
 
 export default function SignInPage() {
   const router = useRouter();
-  const { login, isLoading } = useAuthStore();
   const { data, errors, isSubmitting, setValue, handleSubmit } = useForm(SignInSchema);
+  const [apiError, setApiError] = useState<string>("");
 
   const onSubmit = async (formData: SignInForm) => {
-    await login(formData.email, formData.password);
-    router.push("/");
+    setApiError("");
+    try {
+      const response = await fetch("/api/auth/signin", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        setApiError(result.error || "Sign in failed");
+        toast.error(result.error || "Sign in failed");
+        return;
+      }
+
+      toast.success("Signed in successfully!");
+      // Store user data if needed
+      localStorage.setItem("user", JSON.stringify(result.user));
+      router.push("/");
+    } catch (error) {
+      const errorMsg = "An error occurred during sign in";
+      setApiError(errorMsg);
+      toast.error(errorMsg);
+    }
   };
 
   return (
@@ -85,8 +109,10 @@ export default function SignInPage() {
             </div>
           </div>
 
-          <Button type="submit" className="w-full" size="lg" disabled={isSubmitting || isLoading}>
-            {isSubmitting || isLoading ? "Signing in..." : "Sign in"}
+          {apiError && <p className="text-sm text-red-600">{apiError}</p>}
+
+          <Button type="submit" className="w-full" size="lg" disabled={isSubmitting}>
+            {isSubmitting ? "Signing in..." : "Sign in"}
           </Button>
         </form>
       </div>

@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { useCartStore } from "@/stores/cartStore";
 import ProductCard from "@/components/ProductCard";
 import { Product } from "@/lib/schemas";
+import { formatRupiah } from "@/lib/utils";
 
 type Props = { product: Product; relatedProducts: Product[] };
 
@@ -90,10 +91,10 @@ export default function ProductDetailPage({ product, relatedProducts }: Props) {
               <span className="text-muted-foreground text-sm">({product.reviews} reviews)</span>
             </div>
             <div className="flex items-center space-x-4">
-              <span className="text-3xl font-bold text-gray-900">${product.price.toFixed(2)}</span>
+              <span className="text-3xl font-bold text-gray-900">{formatRupiah(product.price)}</span>
               {product.originalPrice && (
                 <span className="text-xl text-gray-500 line-through">
-                  ${product.originalPrice.toFixed(2)}
+                  {formatRupiah(product.originalPrice)}
                 </span>
               )}
             </div>

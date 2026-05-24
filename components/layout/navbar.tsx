@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { usePathname } from "next/navigation";
 import Link from "next/link";
 import { ShoppingCart, User, Menu, X, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -12,8 +13,14 @@ import Logo from "@/components/logo";
 
 export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const pathname = usePathname();
   const itemCount = useCartStore((state) => state.getItemCount());
   const { user, logout } = useAuthStore();
+
+  // Don't render navbar on admin pages
+  if (pathname.startsWith("/admin")) {
+    return null;
+  }
 
   return (
     <nav className="sticky top-0 z-50 border-b border-gray-200 bg-white">
