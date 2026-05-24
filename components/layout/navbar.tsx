@@ -102,7 +102,7 @@ export default function Navbar() {
               <Link href="/products" className="hover:text-primary text-gray-700 transition-colors">
                 Shop
               </Link>
-              <Link href="/about" className="hover:text-primary text-gray-700 transition-colors">
+              <Link href="/about-us" className="hover:text-primary text-gray-700 transition-colors">
                 About
               </Link>
               <div className="border-t border-gray-200 pt-4">

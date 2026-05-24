@@ -68,7 +68,7 @@ export default function Footer() {
             <ul className="space-y-3">
               <li>
                 <Link
-                  href="/about"
+                  href="/about-us"
                   className="hover:text-primary text-muted-foreground transition-colors">
                   About Us
                 </Link>

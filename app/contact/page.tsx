@@ -9,13 +9,34 @@ import { ContactSchema, type ContactForm } from "@/lib/schemas";
 
 export default function ContactPage() {
   const [isSubmitted, setIsSubmitted] = useState(false);
-  const { data, errors, isSubmitting, setValue, handleSubmit } = useForm(ContactSchema);
+  const [error, setError] = useState<string | null>(null);
+  const { data, errors, isSubmitting, setValue, handleSubmit, reset } = useForm(ContactSchema);
 
   const onSubmit = async (formData: ContactForm) => {
-    // Simulate form submission
-    await new Promise((resolve) => setTimeout(resolve, 2000));
-    console.log("Contact form submitted:", formData);
-    setIsSubmitted(true);
+    try {
+      setError(null);
+      const fullName = `${formData.firstName} ${formData.lastName}`.trim();
+      
+      const res = await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: fullName,
+          email: formData.email,
+          subject: formData.subject || "General Inquiry",
+          message: formData.message,
+        }),
+      });
+
+      if (!res.ok) {
+        const errorData = await res.json();
+        throw new Error(errorData.error || "Failed to send message");
+      }
+
+      setIsSubmitted(true);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "An error occurred while sending your message");
+    }
   };
 
   if (isSubmitted) {
@@ -30,7 +51,11 @@ export default function ContactPage() {
             Thank you for contacting us. We&#39;ll get back to you within 24 hours.
           </p>
           <Button
-            onClick={() => setIsSubmitted(false)}
+            onClick={() => {
+              setIsSubmitted(false);
+              setError(null);
+              reset();
+            }}
             variant="outline"
             className="bg-transparent">
             Send Another Message
@@ -125,6 +150,12 @@ export default function ContactPage() {
           <div className="rounded-xl border border-gray-200 bg-white p-8 shadow-sm">
             <h2 className="mb-6 text-2xl font-semibold text-gray-900">Send us a Message</h2>
 
+            {error && (
+              <div className="mb-6 rounded-lg bg-red-50 p-4 text-red-700">
+                {error}
+              </div>
+            )}
+
             <form
               onSubmit={(e) => {
                 e.preventDefault();
@@ -194,13 +225,28 @@ export default function ContactPage() {
                   <Input
                     id="phone"
                     type="tel"
-                    placeholder="(555) 123-4567"
+                    placeholder="(+62) 812-3456-1111"
                     value={data.phone || ""}
                     onChange={(e) => setValue("phone", e.target.value)}
                   />
                 </div>
               </div>
 
+
+              <div>
+                <label htmlFor="subject" className="mb-2 block text-sm font-medium text-gray-700">
+                  Subject *
+                </label>
+                <Input
+                  id="subject"
+                  type="text"
+                  placeholder="What is this regarding?"
+                  value={data.subject || ""}
+                  onChange={(e) => setValue("subject", e.target.value)}
+                  className={errors.subject ? "border-red-500" : ""}
+                />
+                {errors.subject && <p className="mt-1 text-sm text-red-600">{errors.subject}</p>}
+              </div>
 
               <div>
                 <label htmlFor="message" className="mb-2 block text-sm font-medium text-gray-700">

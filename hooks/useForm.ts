@@ -37,12 +37,19 @@ export function useForm<T extends z.ZodType>(schema: T) {
     }
   };
 
+  const reset = () => {
+    setData({});
+    setErrors({});
+    setIsSubmitting(false);
+  };
+
   return {
     data,
     errors,
     isSubmitting,
     setValue,
     validate,
-    handleSubmit
+    handleSubmit,
+    reset
   };
 }

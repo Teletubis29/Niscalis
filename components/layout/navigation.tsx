@@ -116,6 +116,14 @@ export default function Navigation() {
             <ul className="grid w-[300px] gap-4">
               <li>
                 <NavigationMenuLink asChild>
+                  <Link href="/about-us">
+                    <div className="font-medium">About Us</div>
+                    <div className="text-muted-foreground">Learn about NISCALIS</div>
+                  </Link>
+                </NavigationMenuLink>
+              </li>
+              <li>
+                <NavigationMenuLink asChild>
                   <Link href="#">
                     <div className="font-medium">All Products</div>
                     <div className="text-muted-foreground">Browse our full product catalog.</div>
