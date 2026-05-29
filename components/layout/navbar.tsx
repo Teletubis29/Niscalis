@@ -1,12 +1,11 @@
 "use client";
 
 import { useState } from "react";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import Link from "next/link";
 import { ShoppingCart, User, Menu, X, Search } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { useCartStore } from "@/stores/cartStore";
-import { useAuthStore } from "@/stores/authStore";
+import { useSession, signOut } from "next-auth/react";
 import Image from "next/image";
 import Navigation from "@/components/layout/navigation";
 import Logo from "@/components/logo";
@@ -14,13 +13,46 @@ import Logo from "@/components/logo";
 export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const pathname = usePathname();
+  const router = useRouter();
   const itemCount = useCartStore((state) => state.getItemCount());
-  const { user, logout } = useAuthStore();
+  const { data: session } = useSession();
+  const user = session?.user;
 
   // Don't render navbar on admin pages
   if (pathname.startsWith("/admin")) {
     return null;
   }
+
+  const handleSignOut = () => {
+    console.log("🚪 [SignOut] Logout clicked - clearing cache...");
+    
+    // Clear all cache dan localStorage untuk ensure clean logout
+    if (typeof window !== "undefined") {
+      // Clear localStorage
+      localStorage.clear();
+      console.log("✓ localStorage cleared");
+      
+      // Clear sessionStorage
+      sessionStorage.clear();
+      console.log("✓ sessionStorage cleared");
+      
+      // Clear all IndexedDB (jika ada)
+      if (indexedDB && typeof indexedDB.databases === 'function') {
+        indexedDB.databases().then((dbs) => {
+          dbs.forEach((db) => {
+            if (db.name) {
+              indexedDB.deleteDatabase(db.name);
+            }
+          });
+        }).catch(() => {
+          // Ignore error jika browser tidak support databases API
+        });
+      }
+    }
+    
+    // Sign out directly tanpa confirmation page
+    signOut({ redirect: true, callbackUrl: "/auth/signin" });
+  };
 
   return (
     <nav className="sticky top-0 z-50 border-b border-gray-200 bg-white">
@@ -34,7 +66,7 @@ export default function Navbar() {
             <Navigation />
           </div>
 
-          {/* Search Bar */}
+          {/* Search Bar */}    
           <div className="mx-8 hidden max-w-xs flex-1 items-center md:flex">
             <div className="relative w-full">
               <Search className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 transform text-gray-400" />
@@ -61,27 +93,29 @@ export default function Navbar() {
             {/* User Menu */}
             {user ? (
               <div className="group relative">
-                <Button variant="ghost" size="sm">
-                  <User className="h-5 w-5" />
-                </Button>
-                <div className="invisible absolute right-0 mt-2 w-48 rounded-md bg-white py-1 opacity-0 shadow-lg transition-all group-hover:visible group-hover:opacity-100">
+                <Link href="#" className="relative" onClick={(e) => e.preventDefault()}>
+                  <User className="hover:text-primary h-6 w-6 text-gray-700 transition-colors" />
+                </Link>
+                <div className="invisible absolute right-0 top-full mt-2 w-64 rounded-md border border-gray-200 bg-white py-2 shadow-lg transition-all group-hover:visible group-hover:opacity-100 opacity-0 z-50">
+                  <div className="px-4 py-2 border-b border-gray-100">
+                    <p className="text-xs text-gray-500">Signed in as</p>
+                    <p className="text-sm font-medium text-gray-900 break-words">{user.email}</p>
+                  </div>
                   <Link
-                    href="/profile"
-                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                    Profile
+                    href="/admin/settings"
+                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors">
+                    Settings
                   </Link>
                   <button
-                    onClick={logout}
-                    className="block w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100">
+                    onClick={handleSignOut}
+                    className="block w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 transition-colors border-t border-gray-100">
                     Sign Out
                   </button>
                 </div>
               </div>
             ) : (
-              <Link href="/auth/signin">
-                <Button variant="outline" size="sm">
-                  Sign In
-                </Button>
+              <Link href="/auth/signin" className="hover:text-primary px-4 py-2 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors">
+                Sign In
               </Link>
             )}
 
@@ -99,7 +133,7 @@ export default function Navbar() {
               <Link href="/" className="hover:text-primary text-gray-700 transition-colors">
                 Home
               </Link>
-              <Link href="/products" className="hover:text-primary text-gray-700 transition-colors">
+              <Link href="/shopping" className="hover:text-primary text-gray-700 transition-colors">
                 Shop
               </Link>
               <Link href="/about-us" className="hover:text-primary text-gray-700 transition-colors">

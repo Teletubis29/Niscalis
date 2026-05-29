@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { Pencil, Trash2, Plus } from "lucide-react";
+import { Pencil, Trash2, Plus, RotateCcw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { formatRupiah } from "@/lib/utils";
@@ -48,7 +48,13 @@ export default function ProductsPage() {
   const fetchProducts = async () => {
     try {
       setLoading(true);
-      const res = await fetch("/api/admin/products");
+      const res = await fetch("/api/admin/products", {
+        method: "GET",
+        cache: "no-store",
+        headers: {
+          "Cache-Control": "no-cache, no-store, must-revalidate",
+        },
+      });
       if (!res.ok) throw new Error("Failed to fetch products");
       const data = await res.json();
       setProducts(data);
@@ -79,12 +85,22 @@ export default function ProductsPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-3xl font-bold">Products</h1>
-        <Link href="/admin/products/create">
-          <Button>
-            <Plus className="mr-2 h-4 w-4" />
-            Add Product
+        <div className="flex gap-2">
+          <Button
+            variant="outline"
+            onClick={fetchProducts}
+            disabled={loading}
+          >
+            <RotateCcw className="mr-2 h-4 w-4" />
+            Refresh
           </Button>
-        </Link>
+          <Link href="/admin/products/create">
+            <Button>
+              <Plus className="mr-2 h-4 w-4" />
+              Add Product
+            </Button>
+          </Link>
+        </div>
       </div>
 
       {error && (

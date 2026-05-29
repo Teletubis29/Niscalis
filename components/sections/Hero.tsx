@@ -15,7 +15,7 @@ export default function Hero() {
               Discover curated products, properties, and services designed to simplify your everyday life.
             </p>
             <div className="flex flex-col gap-4 sm:flex-row">
-              <Link href="/products">
+              <Link href="/shopping">
                 <Button size="lg" className="w-full sm:w-auto">
                   Shop Now
                 </Button>
@@ -28,10 +28,10 @@ export default function Hero() {
             </div>
           </div>
           <div className="relative">
-            <div className="aspect-square overflow-hidden rounded-2xl bg-gradient-to-br from-[#10a147] to-[#192929]/60">
+            <div className="aspect-square overflow-hidden rounded-2xl">
               <img
                 // src="https://images.unsplash.com/photo-1511892549826-a48122d9b258?q=80&w=1171&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
-                src="/test10.png"
+                src="/test-12.jpeg"
                 alt="Hero Product"
                 className="h-full w-full object-cover"
               />

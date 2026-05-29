@@ -129,22 +129,22 @@ export const products: Product[] = sampleProducts.map((product) => ProductSchema
 export const categories = [
   {
     name: "Shopping",
-    href: "/products?category=shopping",
+    href: "/shopping?category=shopping",
     count: "500+ products"
   },
   {
     name: "Photography",
-    href: "/products?category=photography",
+    href: "/shopping?category=photography",
     count: "60+ products"
   },
   // {
   //   name: "Gaming",
-  //   href: "/products?category=gaming",
+  //   href: "/shopping?category=gaming",
   //   count: "150+ products"
   // },
   {
     name: "Property",
-    href: "/products?category=property",
+    href: "/shopping?category=property",
     count: "300+ products"
   }
 ] as const;

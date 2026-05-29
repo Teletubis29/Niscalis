@@ -1,6 +1,7 @@
 "use client";
 
 import { usePathname } from "next/navigation";
+import { SessionProvider } from "next-auth/react";
 import Navbar from "@/components/layout/navbar";
 import Footer from "@/components/layout/footer";
 
@@ -17,10 +18,10 @@ export function LayoutWrapper({ children }: { children: React.ReactNode }) {
   const shouldHideFooter = hiddenFooterRoutes.some(route => pathname.startsWith(route));
 
   return (
-    <>
+    <SessionProvider>
       {!shouldHideNavbar && <Navbar />}
       {children}
       {!shouldHideFooter && <Footer />}
-    </>
+    </SessionProvider>
   );
 }

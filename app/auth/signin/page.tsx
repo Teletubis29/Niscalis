@@ -8,6 +8,7 @@ import { SignInSchema, type SignInForm } from "@/lib/schemas";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
+import { signIn } from "next-auth/react";
 
 export default function SignInPage() {
   const router = useRouter();
@@ -17,27 +18,30 @@ export default function SignInPage() {
   const onSubmit = async (formData: SignInForm) => {
     setApiError("");
     try {
-      const response = await fetch("/api/auth/signin", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
+      console.log("🔐 [SignInPage] Attempting login with:", formData.email);
+      
+      const result = await signIn("credentials", {
+        email: formData.email,
+        password: formData.password,
+        redirect: false,
       });
 
-      const result = await response.json();
+      console.log("📊 [SignInPage] SignIn result:", result);
 
-      if (!response.ok) {
-        setApiError(result.error || "Sign in failed");
-        toast.error(result.error || "Sign in failed");
-        return;
+      if (!result?.ok) {
+        const errorMsg = result?.error === "CredentialsSignin" 
+          ? "Invalid email or password" 
+          : result?.error || "Sign in failed";
+        throw new Error(errorMsg);
       }
-
+      
       toast.success("Signed in successfully!");
-      // Store user data if needed
-      localStorage.setItem("user", JSON.stringify(result.user));
-      router.push("/");
+      console.log("✅ [SignInPage] Login successful, redirecting...");
+      setTimeout(() => router.push("/"), 500);
     } catch (error) {
-      const errorMsg = "An error occurred during sign in";
+      const errorMsg = error instanceof Error ? error.message : "An error occurred during sign in";
       setApiError(errorMsg);
+      console.error("❌ [SignInPage] Login error:", errorMsg);
       toast.error(errorMsg);
     }
   };

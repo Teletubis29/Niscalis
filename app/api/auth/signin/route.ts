@@ -6,11 +6,13 @@ import { SignInSchema } from "@/lib/schemas";
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
+    console.log("📥 [signin] Request body:", body.email)
 
     // Validate the request body
     const validationResult = SignInSchema.safeParse(body);
 
     if (!validationResult.success) {
+      console.log("❌ [signin] Validation failed:", validationResult.error.issues)
       return NextResponse.json(
         { error: "Validation failed", issues: validationResult.error.issues },
         { status: 400 }
@@ -25,6 +27,7 @@ export async function POST(request: NextRequest) {
     });
 
     if (!user) {
+      console.log("❌ [signin] User not found:", email)
       return NextResponse.json(
         { error: "Invalid email or password" },
         { status: 401 }
@@ -35,6 +38,7 @@ export async function POST(request: NextRequest) {
     const isPasswordValid = await bcrypt.compare(password, user.password);
 
     if (!isPasswordValid) {
+      console.log("❌ [signin] Invalid password for user:", email)
       return NextResponse.json(
         { error: "Invalid email or password" },
         { status: 401 }
@@ -43,6 +47,7 @@ export async function POST(request: NextRequest) {
 
     // Return user data (without password)
     const { password: _, ...userWithoutPassword } = user;
+    console.log("✅ [signin] Login successful:", email)
 
     return NextResponse.json(
       {
@@ -52,7 +57,7 @@ export async function POST(request: NextRequest) {
       { status: 200 }
     );
   } catch (error) {
-    console.error("Sign in error:", error);
+    console.error("❌ [signin] Error:", error);
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 }

@@ -136,10 +136,10 @@ export default function ContactPage() {
                   <h4 className="text-sm font-medium text-gray-900">Returns</h4>
                   <p className="text-muted-foreground text-sm">30-day return policy on all items</p>
                 </div>
-                <div>
+                {/* <div>
                   <h4 className="text-sm font-medium text-gray-900">Shipping</h4>
                   <p className="text-muted-foreground text-sm">Free shipping on orders over $100</p>
-                </div>
+                </div> */}
               </div>
             </div>
           </div>

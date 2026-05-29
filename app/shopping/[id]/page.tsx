@@ -1,5 +1,5 @@
 import { products } from "@/lib/data";
-import ProductDetailPage from "@/app/products/[id]/product-detail";
+import ProductDetailPage from "@/app/shopping/[id]/product-detail";
 
 export default async function Page({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -18,3 +18,4 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
 
   return <ProductDetailPage product={product} relatedProducts={relatedProducts} />;
 }
+

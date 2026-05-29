@@ -8,6 +8,7 @@ import { SignUpSchema, type SignUpForm } from "@/lib/schemas";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
+import { signIn } from "next-auth/react";
 
 export default function SignUpPage() {
   const router = useRouter();
@@ -17,25 +18,42 @@ export default function SignUpPage() {
   const onSubmit = async (formData: SignUpForm) => {
     setApiError("");
     try {
-      const response = await fetch("/api/auth/signup", {
+      console.log("📝 [SignUpPage] Form data:", formData);
+      const { confirmPassword, ...signupData } = formData;
+      console.log("📝 [SignUpPage] Signup data (without confirmPassword):", signupData);
+      
+      // Create the user account
+      const signupResponse = await fetch("/api/auth/signup", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(signupData),
       });
 
-      const result = await response.json();
+      if (!signupResponse.ok) {
+        const errorData = await signupResponse.json();
+        throw new Error(errorData.error || "Sign up failed");
+      }
 
-      if (!response.ok) {
-        setApiError(result.error || "Sign up failed");
-        toast.error(result.error || "Sign up failed");
-        return;
+      console.log("✅ [SignUpPage] Account created, now signing in...");
+
+      // Sign them in
+      const result = await signIn("credentials", {
+        email: signupData.email,
+        password: signupData.password,
+        redirect: false,
+      });
+
+      if (!result?.ok) {
+        throw new Error(result?.error || "Sign in after signup failed");
       }
 
       toast.success("Account created successfully!");
-      router.push("/auth/signin");
+      console.log("✅ [SignUpPage] Signup and signin successful, redirecting...");
+      router.push("/");
     } catch (error) {
-      const errorMsg = "An error occurred during sign up";
+      const errorMsg = error instanceof Error ? error.message : "An error occurred during sign up";
       setApiError(errorMsg);
+      console.error("❌ [SignUpPage] Signup error:", errorMsg, error);
       toast.error(errorMsg);
     }
   };
@@ -138,7 +156,11 @@ export default function SignUpPage() {
             </label>
           </div>
 
-          {apiError && <p className="text-sm text-red-600">{apiError}</p>}
+          {apiError && (
+            <div className="rounded-md bg-red-50 p-4 text-sm text-red-800">
+              {apiError}
+            </div>
+          )}
 
           <Button type="submit" className="w-full" size="lg" disabled={isSubmitting}>
             {isSubmitting ? "Creating account..." : "Create account"}

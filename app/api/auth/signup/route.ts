@@ -1,18 +1,27 @@
 import { NextRequest, NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/prisma";
-import { SignUpSchema } from "@/lib/schemas";
+import { SignUpAPISchema } from "@/lib/schemas";
 
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
+    console.log("📥 [signup] Full request body:", JSON.stringify(body, null, 2))
 
     // Validate the request body
-    const validationResult = SignUpSchema.safeParse(body);
+    const validationResult = SignUpAPISchema.safeParse(body);
 
     if (!validationResult.success) {
+      console.log("❌ [signup] Validation failed!");
+      validationResult.error.issues.forEach(issue => {
+        console.log(`  - ${issue.path.join('.')}: ${issue.message}`)
+      })
       return NextResponse.json(
-        { error: "Validation failed", issues: validationResult.error.issues },
+        { 
+          error: "Validation failed", 
+          issues: validationResult.error.issues,
+          received: body
+        },
         { status: 400 }
       );
     }
@@ -25,6 +34,7 @@ export async function POST(request: NextRequest) {
     });
 
     if (existingUser) {
+      console.log("❌ [signup] User already exists:", email)
       return NextResponse.json(
         { error: "User with this email already exists" },
         { status: 409 }
@@ -51,6 +61,8 @@ export async function POST(request: NextRequest) {
       },
     });
 
+    console.log("✅ [signup] User created successfully:", email)
+
     return NextResponse.json(
       {
         message: "User created successfully",
@@ -59,7 +71,7 @@ export async function POST(request: NextRequest) {
       { status: 201 }
     );
   } catch (error) {
-    console.error("Sign up error:", error);
+    console.error("❌ [signup] Error:", error);
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 }

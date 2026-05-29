@@ -86,14 +86,14 @@ export default function Navigation() {
                   </Link>
                 </NavigationMenuLink>
               </li>
-              <ListItem href="#" title="Summer Collection">
-                Lightweight essentials perfect for the warm season.
+              <ListItem href="/shopping" title="Shopping">
+                Discover a wide range of products at great prices for your everyday needs.
               </ListItem>
-              <ListItem href="#" title="Accessories">
-                Complete your look with our stylish bags, jewelry, and more.
+              <ListItem href="/photography" title="Photography">
+                Upgrade your photography gear and capture every moment like a pro.
               </ListItem>
-              <ListItem href="#" title="Sale">
-                Shop discounted items before they&#39;re gone.
+              <ListItem href="/property " title="Property">
+                Discover your dream property with prime locations and competitive prices.
               </ListItem>
             </ul>
           </NavigationMenuContent>
@@ -130,9 +130,9 @@ export default function Navigation() {
                   </Link>
                 </NavigationMenuLink>
                 <NavigationMenuLink asChild>
-                  <Link href="#">
-                    <div className="font-medium">FAQs</div>
-                    <div className="text-muted-foreground">Answers to common questions.</div>
+                  <Link href="/contact">
+                    <div className="font-medium">Contact</div>
+                    <div className="text-muted-foreground">Get in touch with our team for any inquiries.</div>
                   </Link>
                 </NavigationMenuLink>
                 <NavigationMenuLink asChild>

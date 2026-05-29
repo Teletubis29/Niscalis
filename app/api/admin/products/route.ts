@@ -9,7 +9,14 @@ export async function GET() {
         createdAt: "desc",
       },
     });
-    return NextResponse.json(products);
+    
+    const response = NextResponse.json(products);
+    // Disable caching to ensure fresh data from database
+    response.headers.set('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+    response.headers.set('Pragma', 'no-cache');
+    response.headers.set('Expires', '0');
+    
+    return response;
   } catch (error) {
     console.error("[PRODUCTS_GET]", error);
     return NextResponse.json(

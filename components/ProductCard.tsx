@@ -35,7 +35,7 @@ export default function ProductCard({ product }: ProductCardProps) {
         <button className="absolute top-3 right-3 z-10 flex h-8 w-8 items-center justify-center rounded-full bg-white opacity-0 transition-opacity group-hover:opacity-100">
           <Heart className="h-4 w-4 text-gray-600" />
         </button>
-        <Link href={`/products/${product.id}`}>
+        <Link href={`/shopping/${product.id}`}>
           <img
             src={product.image || "/placeholder.svg"}
             alt={product.name}
@@ -45,7 +45,7 @@ export default function ProductCard({ product }: ProductCardProps) {
       </div>
 
       <div className="p-4">
-        <Link href={`/products/${product.id}`}>
+        <Link href={`/shopping/${product.id}`}>
           <h3 className="hover:text-primary mb-2 line-clamp-2 font-semibold text-gray-900 transition-colors">
             {product.name}
           </h3>
@@ -57,7 +57,7 @@ export default function ProductCard({ product }: ProductCardProps) {
               <Star
                 key={i}
                 className={`h-4 w-4 ${
-                  i < Math.floor(product.rating) ? "fill-current text-yellow-400" : "text-gray-300"
+                  i < Math.floor(product.rating || 0) ? "fill-current text-yellow-400" : "text-gray-300"
                 }`}
               />
             ))}
