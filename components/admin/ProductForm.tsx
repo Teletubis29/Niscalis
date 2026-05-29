@@ -65,19 +65,14 @@ export default function ProductForm({ initialData, isLoading = false }: ProductF
             }));
           }
         } else {
-          // For rating: only accept multiples of 0.5 (1.5, 2.5, 3.5, etc)
+          // For rating: accept decimal numbers 0-5 with 0.5 steps
           if (name === "rating") {
-            if (/^\d*\.?\d*$/.test(value)) {
-              const numValue = parseFloat(value);
-              if (!isNaN(numValue)) {
-                // Check if it's a multiple of 0.5 (value * 2 should be integer)
-                if ((numValue * 2) % 1 === 0 && numValue <= 5 && numValue >= 0) {
-                  setFormData((prev) => ({
-                    ...prev,
-                    [name]: numValue,
-                  }));
-                }
-              }
+            const numValue = parseFloat(value);
+            if (!isNaN(numValue) && numValue >= 0 && numValue <= 5) {
+              setFormData((prev) => ({
+                ...prev,
+                [name]: numValue,
+              }));
             }
           } else {
             // For reviews: only accept integers
@@ -204,9 +199,11 @@ export default function ProductForm({ initialData, isLoading = false }: ProductF
               <Input
                 id="rating"
                 name="rating"
-                type="text"
-                inputMode="decimal"
-                placeholder="1.5 atau 2.5"
+                type="number"
+                min="0"
+                max="5"
+                step="0.5"
+                placeholder="e.g., 1.5, 2.5, 3.5"
                 value={formData.rating ?? ""}
                 onChange={handleInputChange}
               />
