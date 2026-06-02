@@ -9,12 +9,15 @@ import { formatRupiah } from "@/lib/utils";
 
 interface ProductCardProps {
   product: Product;
+  basePath?: string;
 }
 
-export default function ProductCard({ product }: ProductCardProps) {
+export default function ProductCard({ product, basePath = "/shopping" }: ProductCardProps) {
   const addItem = useCartStore((state) => state.addItem);
 
-  const handleAddToCart = () => {
+  const handleAddToCart = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
     addItem({
       id: product.id,
       name: product.name,
@@ -32,10 +35,15 @@ export default function ProductCard({ product }: ProductCardProps) {
             {product.badge}
           </span>
         )}
-        <button className="absolute top-3 right-3 z-10 flex h-8 w-8 items-center justify-center rounded-full bg-white opacity-0 transition-opacity group-hover:opacity-100">
+        <button 
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+          }}
+          className="absolute top-3 right-3 z-10 flex h-8 w-8 items-center justify-center rounded-full bg-white opacity-0 transition-opacity group-hover:opacity-100">
           <Heart className="h-4 w-4 text-gray-600" />
         </button>
-        <Link href={`/shopping/${product.id}`}>
+        <Link href={`${basePath}/${product.id}`}>
           <img
             src={product.image || "/placeholder.svg"}
             alt={product.name}
@@ -45,7 +53,7 @@ export default function ProductCard({ product }: ProductCardProps) {
       </div>
 
       <div className="p-4">
-        <Link href={`/shopping/${product.id}`}>
+        <Link href={`${basePath}/${product.id}`}>
           <h3 className="hover:text-primary mb-2 line-clamp-2 font-semibold text-gray-900 transition-colors">
             {product.name}
           </h3>

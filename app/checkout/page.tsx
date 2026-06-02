@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { useCartStore } from "@/stores/cartStore";
 import { useForm } from "@/hooks/useForm";
 import { CheckoutSchema, type CheckoutForm } from "@/lib/schemas";
+import { formatRupiah } from "@/lib/utils";
 
 export default function CheckoutPage() {
   const { items, getTotal, clearCart } = useCartStore();

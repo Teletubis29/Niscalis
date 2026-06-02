@@ -89,11 +89,11 @@ export default function Navigation() {
               <ListItem href="/shopping" title="Shopping">
                 Discover a wide range of products at great prices for your everyday needs.
               </ListItem>
+              <ListItem href="/properties" title="Properties">
+                Discover your dream property with prime locations and competitive prices.
+              </ListItem>
               <ListItem href="/photography" title="Photography">
                 Upgrade your photography gear and capture every moment like a pro.
-              </ListItem>
-              <ListItem href="/property " title="Property">
-                Discover your dream property with prime locations and competitive prices.
               </ListItem>
             </ul>
           </NavigationMenuContent>

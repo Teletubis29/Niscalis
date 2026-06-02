@@ -23,6 +23,17 @@ export const ProductSchema = z.object({
     .optional(),
   sizes: z.array(z.string()).optional(),
   features: z.array(z.string()).optional(),
+  // Property-specific fields (optional for backward compatibility)
+  propertyType: z.string().optional(),
+  location: z.string().optional(),
+  bedrooms: z.number().optional(),
+  bathrooms: z.number().optional(),
+  parkingSpaces: z.number().optional(),
+  area: z.number().optional(),
+  landArea: z.number().optional(),
+  yearBuilt: z.number().optional(),
+  condition: z.string().optional(),
+  views: z.number().optional(),
 })
 
 // Cart item schema

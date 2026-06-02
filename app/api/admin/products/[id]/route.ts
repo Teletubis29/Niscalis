@@ -4,10 +4,11 @@ import { prisma } from "@/lib/prisma";
 // GET single product
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const productId = parseInt(params.id);
+    const { id } = await params;
+    const productId = parseInt(id);
 
     const product = await prisma.product.findUnique({
       where: { id: productId },
@@ -33,10 +34,11 @@ export async function GET(
 // PUT update product
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const productId = parseInt(params.id);
+    const { id } = await params;
+    const productId = parseInt(id);
     const body = await request.json();
 
     const { name, description, price, image, category, rating, reviews } = body;
@@ -67,10 +69,11 @@ export async function PUT(
 // DELETE product
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const productId = parseInt(params.id);
+    const { id } = await params;
+    const productId = parseInt(id);
 
     await prisma.product.delete({
       where: { id: productId },

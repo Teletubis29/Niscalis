@@ -66,3 +66,27 @@ model Contact {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
+
+model Property {
+  id              Int      @id @default(autoincrement())
+  name            String
+  description     String?
+  price           Float
+  image           String?
+  category        String?
+  propertyType    String   @default("jual") // "jual" or "sewa"
+  location        String?
+  bedrooms        Int?
+  bathrooms       Int?
+  parkingSpaces   Int?
+  area            Float?   // Luas bangunan dalam m2
+  landArea        Float?   // Luas tanah dalam m2
+  yearBuilt       Int?
+  condition       String?  // "baru", "renovasi", "standart"
+  features        String[] // Array fitur: ["AC", "Kolam Renang", dll]
+  rating          Float?
+  reviews         Int      @default(0)
+  views           Int      @default(0)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}

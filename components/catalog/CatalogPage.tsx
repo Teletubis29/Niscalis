@@ -42,7 +42,11 @@ export default function CatalogPage({ catalogConfig }: CatalogPageProps) {
         throw new Error(`Failed to fetch from ${catalogConfig.apiEndpoint}`);
       }
       const data = await response.json();
-      const transformedItems = data.map((item: any) => ({
+      
+      // Handle both array response and object with data property
+      const itemsArray = Array.isArray(data) ? data : data.data || data;
+      
+      const transformedItems = itemsArray.map((item: any) => ({
         ...item,
         image: item.image || "/placeholder.svg",
         rating: item.rating || 0,
@@ -65,6 +69,7 @@ export default function CatalogPage({ catalogConfig }: CatalogPageProps) {
   // Get price filter config
   const priceFilter = catalogConfig.filters.find((f) => f.id === "price");
   const categoryFilter = catalogConfig.filters.find((f) => f.id === "category");
+  const propertyTypeFilter = catalogConfig.filters.find((f) => f.id === "propertyType");
 
   const isFilterActive = Object.entries(filterState).some(([key, value]) => {
     const filter = catalogConfig.filters.find((f) => f.id === key);
@@ -81,6 +86,14 @@ export default function CatalogPage({ catalogConfig }: CatalogPageProps) {
 
   // Dynamic filtering
   const filteredItems = items
+    .filter((item) => {
+      // Property Type filter (jual/sewa) - only for properties
+      const propertyTypeValue = filterState["propertyType"];
+      if (propertyTypeValue && propertyTypeValue !== "all" && "propertyType" in item) {
+        return (item as any).propertyType === propertyTypeValue;
+      }
+      return true;
+    })
     .filter((item) => {
       // Category filter
       const categoryValue = filterState["category"];
@@ -118,7 +131,25 @@ export default function CatalogPage({ catalogConfig }: CatalogPageProps) {
     purple: "bg-purple-100 text-purple-800",
   };
 
-  const tagColor = colorMap[catalogConfig.colorClass || "green"] || colorMap.green;
+  // Custom color configs for properties (navy blue)
+  const customColorMap: Record<string, { bg: string; text: string }> = {
+    blue: {
+      bg: "#eceff1",
+      text: "#1e3a5f",
+    },
+  };
+
+  const tagColor = catalogConfig.colorClass === "blue" 
+    ? "bg-blue-100 text-blue-800"
+    : colorMap[catalogConfig.colorClass || "green"] || colorMap.green;
+
+  // Get CSS variable overrides for properties
+  const styleOverrides = catalogConfig.colorClass === "blue" 
+    ? {
+        "--primary": "#1e3a5f",
+        "--primary-foreground": "#ffffff",
+      } as React.CSSProperties
+    : {};
 
   return (
     <>
@@ -147,7 +178,7 @@ export default function CatalogPage({ catalogConfig }: CatalogPageProps) {
         </div>
       </div>
 
-      <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8" style={styleOverrides}>
         <div className="flex flex-col gap-8 lg:flex-row">
           {/* Filters Sidebar */}
           <div className="hidden border-r-1 border-gray-200 pr-7 lg:block lg:w-64">
@@ -165,9 +196,16 @@ export default function CatalogPage({ catalogConfig }: CatalogPageProps) {
               {/* Reset Button */}
               <button
                 onClick={resetFilters}
-                className={`text-sm font-medium transition-colors ${
+                style={
+                  catalogConfig.colorClass === "blue" && isFilterActive
+                    ? { color: customColorMap.blue.text }
+                    : undefined
+                }
+                className={`text-sm font-medium transition-colors cursor-pointer ${
                   isFilterActive
-                    ? `text-${catalogConfig.colorClass}-600 hover:text-${catalogConfig.colorClass}-700`
+                    ? catalogConfig.colorClass === "blue"
+                      ? ""
+                      : `text-${catalogConfig.colorClass}-600 hover:text-${catalogConfig.colorClass}-700`
                     : "cursor-default text-gray-400"
                 }`}
                 disabled={!isFilterActive}>
@@ -288,8 +326,25 @@ export default function CatalogPage({ catalogConfig }: CatalogPageProps) {
             {/* Active Filter Tags */}
             {!loading && isFilterActive && (
               <div className="mb-6 flex flex-wrap gap-2">
+                {propertyTypeFilter && filterState["propertyType"] && filterState["propertyType"] !== "all" && (
+                  <div 
+                    style={catalogConfig.colorClass === "blue" ? { backgroundColor: customColorMap.blue.bg, color: customColorMap.blue.text } : undefined}
+                    className={`flex items-center gap-2 rounded-full px-3 py-1 text-sm ${catalogConfig.colorClass !== "blue" ? tagColor : ""}`}>
+                    <span className="capitalize">
+                      {propertyTypeFilter.label}: {filterState["propertyType"]}
+                    </span>
+                    <button
+                      onClick={() => handleFilterChange("propertyType", "all")}
+                      className="hover:opacity-70 transition-opacity"
+                      aria-label="Remove property type filter">
+                      <X className="h-4 w-4" />
+                    </button>
+                  </div>
+                )}
                 {filterState["category"] && filterState["category"] !== "all" && (
-                  <div className={`flex items-center gap-2 rounded-full px-3 py-1 text-sm ${tagColor}`}>
+                  <div 
+                    style={catalogConfig.colorClass === "blue" ? { backgroundColor: customColorMap.blue.bg, color: customColorMap.blue.text } : undefined}
+                    className={`flex items-center gap-2 rounded-full px-3 py-1 text-sm ${catalogConfig.colorClass !== "blue" ? tagColor : ""}`}>
                     <span className="capitalize">
                       {categoryFilter?.label}: {filterState["category"]}
                     </span>
@@ -315,9 +370,7 @@ export default function CatalogPage({ catalogConfig }: CatalogPageProps) {
             {!loading && filteredItems.length > 0 && (
               <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
                 {filteredItems.map((item) => (
-                  <a key={item.id} href={`${catalogConfig.detailPathPrefix}/${item.id}`}>
-                    <ProductCard product={item} />
-                  </a>
+                  <ProductCard key={item.id} product={item} basePath={catalogConfig.detailPathPrefix} />
                 ))}
               </div>
             )}

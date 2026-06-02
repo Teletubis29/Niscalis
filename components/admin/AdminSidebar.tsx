@@ -21,6 +21,11 @@ export default function AdminSidebar() {
       icon: Package,
     },
     {
+      label: "Properties",
+      href: "/admin/properties",
+      icon: Package,
+    },
+    {
       label: "Users",
       href: "/admin/users",
       icon: Users,
