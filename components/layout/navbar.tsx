@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import Link from "next/link";
 import { ShoppingCart, User, Menu, X, Search } from "lucide-react";
@@ -12,11 +12,16 @@ import Logo from "@/components/logo";
 
 export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isMounted, setIsMounted] = useState(false);
   const pathname = usePathname();
   const router = useRouter();
   const itemCount = useCartStore((state) => state.getItemCount());
   const { data: session } = useSession();
   const user = session?.user;
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   // Don't render navbar on admin pages
   if (pathname.startsWith("/admin")) {
@@ -83,7 +88,7 @@ export default function Navbar() {
             {/* Cart */}
             <Link href="/cart" className="relative">
               <ShoppingCart className="hover:text-primary h-6 w-6 text-gray-700 transition-colors" />
-              {itemCount > 0 && (
+              {isMounted && itemCount > 0 && (
                 <span className="bg-primary absolute -top-2 -right-2 flex h-5 w-5 items-center justify-center rounded-full text-xs text-white">
                   {itemCount}
                 </span>

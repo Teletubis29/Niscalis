@@ -31,7 +31,7 @@ export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
 
-    const { name, description, price, image, category, rating, reviews } = body;
+    const { name, description, price, image, stock, category, rating, reviews, thumbnails } = body;
 
     if (!name || price === undefined) {
       return NextResponse.json(
@@ -46,9 +46,11 @@ export async function POST(request: NextRequest) {
         description: description || null,
         price: parseFloat(price),
         image: image || null,
+        stock: stock ? parseInt(stock) : 0,
         category: category || null,
         rating: rating || null,
         reviews: reviews || 0,
+        thumbnails: thumbnails || "[]",
       },
     });
 

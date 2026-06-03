@@ -63,8 +63,8 @@ export const SHOPPING_CONFIG: CatalogConfig = {
     { value: "rating", label: "Highest Rated" },
   ],
   maxPrice: 100000000,
-  emptyStateText: "Tidak ada produk yang sesuai dengan filter",
-  loadingText: "Loading produk...",
+  emptyStateText: "No Products match the filter",
+  loadingText: "Loading products...",
 };
 
 // PROPERTY CONFIG

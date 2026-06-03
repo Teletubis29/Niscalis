@@ -9,7 +9,9 @@ interface Product {
   name: string;
   description: string | null;
   price: number;
+  stock: number;
   image: string | null;
+  thumbnails?: string;
   category: string | null;
   rating: number | null;
   reviews: number;

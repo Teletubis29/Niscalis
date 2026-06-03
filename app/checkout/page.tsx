@@ -1,21 +1,33 @@
 "use client";
 
+import { useState } from "react";
+import { AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { AlertAutoClose } from "@/components/ui/alert";
 import { useCartStore } from "@/stores/cartStore";
 import { useForm } from "@/hooks/useForm";
 import { CheckoutSchema, type CheckoutForm } from "@/lib/schemas";
 import { formatRupiah } from "@/lib/utils";
+import { useRouter } from "next/navigation";
 
 export default function CheckoutPage() {
+  const router = useRouter();
   const { items, getTotal, clearCart } = useCartStore();
   const { data, errors, isSubmitting, setValue, handleSubmit } = useForm(CheckoutSchema);
+  const [alertState, setAlertState] = useState<{ title: string; message: string } | null>(null);
 
   const onSubmit = async (formData: CheckoutForm) => {
     // Handle checkout logic here
     await new Promise((resolve) => setTimeout(resolve, 2000)); // Simulate API call
-    alert("Order placed successfully!");
+    setAlertState({
+      title: "Order Placed Successfully!",
+      message: "Thank you for your purchase. Your order has been confirmed."
+    });
     clearCart();
+    setTimeout(() => {
+      router.push("/");
+    }, 3000);
   };
 
   const subtotal = getTotal();
@@ -26,6 +38,16 @@ export default function CheckoutPage() {
   return (
     <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6 lg:px-8">
       <h1 className="mb-8 text-3xl font-bold text-gray-900">Checkout</h1>
+
+      {/* Alert Notification */}
+      <AlertAutoClose
+        isOpen={alertState !== null}
+        onClose={() => setAlertState(null)}
+        title={alertState?.title}
+        message={alertState?.message || ""}
+        variant="default"
+        icon={<AlertCircle className="h-4 w-4" />}
+      />
 
       <div className="grid grid-cols-1 gap-12 lg:grid-cols-2">
         {/* Checkout Form */}

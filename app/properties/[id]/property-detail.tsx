@@ -5,6 +5,7 @@ import { Star, Heart, MapPin, Bed, Bath, ParkingCircle, Ruler, AlertCircle, Minu
 import { Button } from "@/components/ui/button";
 import { useCartStore } from "@/stores/cartStore";
 import ProductCard from "@/components/ProductCard";
+import ThumbnailGallery from "@/components/ThumbnailGallery";
 import { formatRupiah } from "@/lib/utils";
 
 interface Property {
@@ -12,6 +13,7 @@ interface Property {
   name: string;
   price: number;
   image: string | null;
+  thumbnails?: string;
   description: string | null;
   category: string | null;
   propertyType: string | null;
@@ -31,7 +33,6 @@ interface Property {
 type Props = { property: Property; relatedProperties: Property[] };
 
 export default function PropertiesDetailPage({ property, relatedProperties }: Props) {
-  const [selectedImage, setSelectedImage] = useState(0);
   const [quantity, setQuantity] = useState(1);
   const addItem = useCartStore((state) => state.addItem);
 
@@ -45,42 +46,27 @@ export default function PropertiesDetailPage({ property, relatedProperties }: Pr
     });
   };
 
-  const propertyImages = [
-    property.image || "/placeholder.svg",
-    property.image || "/placeholder.svg",
-    property.image || "/placeholder.svg",
-    property.image || "/placeholder.svg",
-  ].filter(Boolean);
+  // Parse thumbnails from JSON string
+  let thumbnailImages: string[] = [];
+  if (property.thumbnails) {
+    try {
+      thumbnailImages = JSON.parse(property.thumbnails);
+    } catch (e) {
+      console.error("Failed to parse thumbnails:", e);
+      thumbnailImages = [];
+    }
+  }
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
       <div className="grid grid-cols-1 gap-12 lg:grid-cols-2">
         {/* Property Images */}
-        <div className="space-y-4">
-          <div className="aspect-square overflow-hidden rounded-xl bg-gray-100">
-            <img
-              src={propertyImages[selectedImage] || "/placeholder.svg"}
-              alt={property.name}
-              className="h-full w-full object-cover text-[#1e3a5f]"
-            />
-          </div>
-          <div className="grid grid-cols-4 gap-4">
-            {propertyImages.map((image, index) => (
-              <button
-                key={index}
-                onClick={() => setSelectedImage(index)}
-                className={`aspect-square overflow-hidden rounded-lg border-2 bg-gray-100 ${
-                  selectedImage === index ? "" : "border-transparent"
-                }`}
-                style={selectedImage === index ? { borderColor: '#1e3a5f' } : undefined}>
-                <img
-                  src={image || "/placeholder.svg"}
-                  alt={`${property.name} ${index + 1}`}
-                  className="h-full w-full object-cover"
-                />
-              </button>
-            ))}
-          </div>
+        <div>
+          <ThumbnailGallery 
+            images={thumbnailImages}
+            mainImage={property.image}
+            title={property.name}
+          />
         </div>
 
         {/* Property Info */}

@@ -311,7 +311,7 @@ export default function CatalogPage({ catalogConfig }: CatalogPageProps) {
             )}
 
             {/* Error State */}
-            {error && !loading && (
+            {/* {error && !loading && (
               <div className="mb-6 rounded-lg bg-red-50 p-4 text-red-800">
                 <p className="font-semibold">Error loading items</p>
                 <p className="text-sm">{error}</p>
@@ -321,7 +321,7 @@ export default function CatalogPage({ catalogConfig }: CatalogPageProps) {
                   Retry
                 </Button>
               </div>
-            )}
+            )} */}
 
             {/* Active Filter Tags */}
             {!loading && isFilterActive && (

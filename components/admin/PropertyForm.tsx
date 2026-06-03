@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import ImageUploader from "@/components/admin/ImageUploader";
 import {
   Select,
   SelectContent,
@@ -20,7 +21,9 @@ interface Property {
   name: string;
   description: string | null;
   price: number;
+  stock: number;
   image: string | null;
+  thumbnails?: string;
   category: string | null;
   propertyType: string;
   location: string | null;
@@ -45,12 +48,20 @@ export default function PropertyForm({ initialData, isLoading = false }: Propert
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [mainImage, setMainImage] = useState<string[]>(
+    initialData?.image ? [initialData.image] : []
+  );
+  const [thumbnails, setThumbnails] = useState<string[]>(
+    initialData?.thumbnails ? JSON.parse(initialData.thumbnails) : []
+  );
   const [formData, setFormData] = useState<Property>(
     initialData || {
       name: "",
       description: "",
       price: 0,
+      stock: 0,
       image: "",
+      thumbnails: "[]",
       category: "",
       propertyType: "jual",
       location: "",
@@ -73,7 +84,7 @@ export default function PropertyForm({ initialData, isLoading = false }: Propert
   ) => {
     const { name, value } = e.target;
 
-    if (["price", "bedrooms", "bathrooms", "parkingSpaces", "area", "landArea", "yearBuilt", "reviews"].includes(name)) {
+    if (["price", "stock", "bedrooms", "bathrooms", "parkingSpaces", "area", "landArea", "yearBuilt", "reviews"].includes(name)) {
       if (value === "") {
         setFormData((prev) => ({
           ...prev,
@@ -91,6 +102,15 @@ export default function PropertyForm({ initialData, isLoading = false }: Propert
                 [name]: numValue,
               }));
             }
+          }
+        } else if (name === "stock") {
+          // For stock: only accept integers
+          const numValue = parseInt(value, 10);
+          if (!isNaN(numValue)) {
+            setFormData((prev) => ({
+              ...prev,
+              [name]: numValue,
+            }));
           }
         } else {
           // For other numbers: allow decimal values
@@ -150,6 +170,25 @@ export default function PropertyForm({ initialData, isLoading = false }: Propert
     }));
   };
 
+  const handleThumbnailsChange = (images: string[]) => {
+    setThumbnails(images);
+  };
+
+  const handleMainImageChange = (images: string[]) => {
+    setMainImage(images);
+    if (images.length > 0) {
+      setFormData((prev) => ({
+        ...prev,
+        image: images[0],
+      }));
+    } else {
+      setFormData((prev) => ({
+        ...prev,
+        image: null,
+      }));
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -162,10 +201,16 @@ export default function PropertyForm({ initialData, isLoading = false }: Propert
 
       const method = initialData?.id ? "PUT" : "POST";
 
+      const submitData = {
+        ...formData,
+        image: mainImage.length > 0 ? mainImage[0] : null,
+        thumbnails: JSON.stringify(thumbnails),
+      };
+
       const res = await fetch(url, {
         method,
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(submitData),
       });
 
       if (!res.ok) {
@@ -227,6 +272,19 @@ export default function PropertyForm({ initialData, isLoading = false }: Propert
                   value={formData.price ? formatPrice(formData.price) : ""}
                   onChange={handleInputChange}
                   required
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="stock">Stock</Label>
+                <Input
+                  id="stock"
+                  name="stock"
+                  type="text"
+                  inputMode="numeric"
+                  placeholder="Enter stock quantity"
+                  value={formData.stock ?? ""}
+                  onChange={handleInputChange}
                 />
               </div>
 
@@ -374,13 +432,20 @@ export default function PropertyForm({ initialData, isLoading = false }: Propert
 
           {/* Image & Media */}
           <div className="space-y-2">
-            <Label htmlFor="image">Image URL</Label>
-            <Input
-              id="image"
-              name="image"
-              placeholder="https://example.com/image.jpg"
-              value={formData.image || ""}
-              onChange={handleInputChange}
+            <Label>Main Image Upload *</Label>
+            <ImageUploader 
+              onImagesChange={handleMainImageChange}
+              currentImages={mainImage}
+              maxImages={1}
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label>Additional Images (Thumbnails)</Label>
+            <ImageUploader 
+              onImagesChange={handleThumbnailsChange}
+              currentImages={thumbnails}
+              maxImages={5}
             />
           </div>
 

@@ -7,13 +7,16 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import ImageUploader from "@/components/admin/ImageUploader";
 
 interface Product {
   id?: number;
   name: string;
   description: string | null;
   price: number;
+  stock: number;
   image: string | null;
+  thumbnails?: string;
   category: string | null;
   rating: number | null;
   reviews: number;
@@ -28,12 +31,20 @@ export default function ProductForm({ initialData, isLoading = false }: ProductF
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [mainImage, setMainImage] = useState<string[]>(
+    initialData?.image ? [initialData.image] : []
+  );
+  const [thumbnails, setThumbnails] = useState<string[]>(
+    initialData?.thumbnails ? JSON.parse(initialData.thumbnails) : []
+  );
   const [formData, setFormData] = useState<Product>(
     initialData || {
       name: "",
       description: "",
       price: 0,
+      stock: 0,
       image: "",
+      thumbnails: "[]",
       category: "",
       rating: 0,
       reviews: 0,
@@ -45,7 +56,7 @@ export default function ProductForm({ initialData, isLoading = false }: ProductF
   ) => {
     const { name, value } = e.target;
     
-    if (name === "price" || name === "rating" || name === "reviews") {
+    if (name === "price" || name === "rating" || name === "reviews" || name === "stock") {
       // For empty values
       if (value === "") {
         setFormData((prev) => ({
@@ -53,12 +64,21 @@ export default function ProductForm({ initialData, isLoading = false }: ProductF
           [name]: name === "price" ? 0 : null,
         }));
       } else {
-        // For price: only allow numbers (Rp format with thousand separator)
+        // For price: only allow numbers
         if (name === "price") {
           // Remove all non-digit characters
           const cleanedValue = value.replace(/\D/g, "");
           if (cleanedValue) {
             const numValue = parseInt(cleanedValue, 10);
+            setFormData((prev) => ({
+              ...prev,
+              [name]: numValue,
+            }));
+          }
+        } else if (name === "stock") {
+          // For stock: only accept integers
+          const numValue = parseInt(value, 10);
+          if (!isNaN(numValue)) {
             setFormData((prev) => ({
               ...prev,
               [name]: numValue,
@@ -99,6 +119,25 @@ export default function ProductForm({ initialData, isLoading = false }: ProductF
     return new Intl.NumberFormat("id-ID").format(value);
   };
 
+  const handleThumbnailsChange = (images: string[]) => {
+    setThumbnails(images);
+  };
+
+  const handleMainImageChange = (images: string[]) => {
+    setMainImage(images);
+    if (images.length > 0) {
+      setFormData((prev) => ({
+        ...prev,
+        image: images[0],
+      }));
+    } else {
+      setFormData((prev) => ({
+        ...prev,
+        image: null,
+      }));
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -111,10 +150,16 @@ export default function ProductForm({ initialData, isLoading = false }: ProductF
 
       const method = initialData?.id ? "PUT" : "POST";
 
+      const submitData = {
+        ...formData,
+        image: mainImage.length > 0 ? mainImage[0] : null,
+        thumbnails: JSON.stringify(thumbnails),
+      };
+
       const res = await fetch(url, {
         method,
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(submitData),
       });
 
       if (!res.ok) {
@@ -173,23 +218,25 @@ export default function ProductForm({ initialData, isLoading = false }: ProductF
             </div>
 
             <div className="space-y-2">
+              <Label htmlFor="stock">Stock</Label>
+              <Input
+                id="stock"
+                name="stock"
+                type="text"
+                inputMode="numeric"
+                placeholder="Enter stock quantity"
+                value={formData.stock ?? ""}
+                onChange={handleInputChange}
+              />
+            </div>
+
+            <div className="space-y-2">
               <Label htmlFor="category">Category</Label>
               <Input
                 id="category"
                 name="category"
                 placeholder="e.g., Electronics, Fashion"
                 value={formData.category || ""}
-                onChange={handleInputChange}
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="image">Image URL</Label>
-              <Input
-                id="image"
-                name="image"
-                placeholder="https://example.com/image.jpg"
-                value={formData.image || ""}
                 onChange={handleInputChange}
               />
             </div>
@@ -221,6 +268,24 @@ export default function ProductForm({ initialData, isLoading = false }: ProductF
                 onChange={handleInputChange}
               />
             </div>
+          </div>
+
+          <div className="space-y-2">
+            <Label>Main Image Upload *</Label>
+            <ImageUploader 
+              onImagesChange={handleMainImageChange}
+              currentImages={mainImage}
+              maxImages={1}
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label>Additional Images (Thumbnails)</Label>
+            <ImageUploader 
+              onImagesChange={handleThumbnailsChange}
+              currentImages={thumbnails}
+              maxImages={5}
+            />
           </div>
 
           <div className="space-y-2">

@@ -1,17 +1,21 @@
 ﻿"use client";
 
 import { useState } from "react";
-import { Star, Heart, Minus, Plus, Truck, RotateCcw } from "lucide-react";
+import { Star, Heart, Minus, Plus, Truck, RotateCcw, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { AlertAutoClose } from "@/components/ui/alert";
 import { useCartStore } from "@/stores/cartStore";
 import ProductCard from "@/components/ProductCard";
+import ThumbnailGallery from "@/components/ThumbnailGallery";
 import { formatRupiah } from "@/lib/utils";
 
 interface Product {
   id: number;
   name: string;
   price: number;
+  stock?: number;
   image: string | null;
+  thumbnails?: string;
   description: string | null;
   category: string | null;
   rating: number | null;
@@ -27,62 +31,101 @@ interface Product {
 type Props = { product: Product; relatedProducts: Product[] };
 
 export default function ProductDetailPage({ product, relatedProducts }: Props) {
-  const [selectedImage, setSelectedImage] = useState(0);
   const [selectedColor, setSelectedColor] = useState(product?.colors?.[0]);
   const [quantity, setQuantity] = useState(1);
+  const [alertState, setAlertState] = useState<{ title: string; message: string; variant: "default" | "destructive" } | null>(null);
   const addItem = useCartStore((state) => state.addItem);
 
   const handleAddToCart = () => {
+    if (!product.stock || product.stock <= 0) {
+      setAlertState({
+        title: "Out of Stock",
+        message: "Produk tidak tersedia (out of stock)",
+        variant: "destructive"
+      });
+      return;
+    }
+    
+    if (quantity > product.stock) {
+      setAlertState({
+        title: "Quantity Exceeds Stock",
+        message: `Quantity tidak boleh lebih dari stock tersedia (${product.stock})`,
+        variant: "destructive"
+      });
+      return;
+    }
+
+    // Check total items in cart for this product + new quantity
+    const cartItems = useCartStore.getState().items;
+    const currentItemInCart = cartItems.find((item) => item.id === String(product.id));
+    const currentQuantityInCart = currentItemInCart?.quantity || 0;
+    const totalQuantity = currentQuantityInCart + quantity;
+
+    if (totalQuantity > product.stock) {
+      setAlertState({
+        title: "Total Stock Exceeds Available",
+        message: `Only ${product.stock} items available in stock.`,
+        variant: "destructive"
+      });
+      return;
+    }
+    
     addItem({
       id: String(product.id),
       name: product.name,
       price: product.price,
-      image: product.images?.[0] || product.image || "/placeholder.svg",
+      image: product.image || "/placeholder.svg",
       quantity: quantity
+    });
+
+    // Show success message
+    setAlertState({
+      title: "Added to Cart",
+      message: `${product.name} berhasil ditambahkan ke cart`,
+      variant: "default"
     });
   };
 
-  const productImages = product.images || [
-    product.image,
-    product.image,
-    product.image,
-    product.image
-  ].filter(Boolean) as string[];
+  // Parse thumbnails from JSON string
+  let thumbnailImages: string[] = [];
+  if (product.thumbnails) {
+    try {
+      thumbnailImages = JSON.parse(product.thumbnails);
+    } catch (e) {
+      console.error("Failed to parse thumbnails:", e);
+      thumbnailImages = [];
+    }
+  }
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+      {/* Alert Notification */}
+      <AlertAutoClose
+        isOpen={alertState !== null}
+        onClose={() => setAlertState(null)}
+        title={alertState?.title}
+        message={alertState?.message || ""}
+        variant={alertState?.variant}
+        icon={<AlertCircle className="h-4 w-4" />}
+      />
+      
       <div className="grid grid-cols-1 gap-12 lg:grid-cols-2">
         {/* Product Images */}
-        <div className="space-y-4">
-          <div className="aspect-square overflow-hidden rounded-xl bg-gray-100">
-            <img
-              src={productImages[selectedImage] || "/placeholder.svg"}
-              alt={product.name}
-              className="h-full w-full object-cover"
-            />
-          </div>
-          <div className="grid grid-cols-4 gap-4">
-            {productImages.map((image, index) => (
-              <button
-                key={index}
-                onClick={() => setSelectedImage(index)}
-                className={`aspect-square overflow-hidden rounded-lg border-2 bg-gray-100 ${
-                  selectedImage === index ? "border-primary" : "border-transparent"
-                }`}>
-                <img
-                  src={image || "/placeholder.svg"}
-                  alt={`${product.name} ${index + 1}`}
-                  className="h-full w-full object-cover"
-                />
-              </button>
-            ))}
-          </div>
+        <div>
+          <ThumbnailGallery 
+            images={thumbnailImages}
+            mainImage={product.image}
+            title={product.name}
+          />
         </div>
 
         {/* Product Info */}
         <div className="space-y-6">
           <div>
             <h1 className="mb-2 text-3xl font-bold text-gray-900">{product.name}</h1>
+             <h1 className="text-sm text-gray-500 mb-2">
+                Stock Available : <span className={product.stock ? (product.stock > 0 ? " font-medium" : "text-red-600 font-medium") : ""}>{product.stock || 0}</span>
+              </h1>
             <div className="mb-4 flex items-center space-x-4">
               <div className="flex items-center">
                 {[...Array(5)].map((_, i) => (
@@ -136,7 +179,10 @@ export default function ProductDetailPage({ product, relatedProducts }: Props) {
 
           {/* Quantity */}
           <div>
-            <h3 className="mb-3 font-semibold text-gray-900">Quantity</h3>
+            <div className="mb-3 flex items-center justify-between">
+              <h3 className="font-semibold text-gray-900">Quantity</h3>
+             
+            </div>
             <div className="flex items-center space-x-3">
               <button
                 onClick={() => setQuantity(Math.max(1, quantity - 1))}
@@ -145,19 +191,30 @@ export default function ProductDetailPage({ product, relatedProducts }: Props) {
               </button>
               <span className="w-12 text-center font-semibold">{quantity}</span>
               <button
-                onClick={() => setQuantity(quantity + 1)}
-                className="flex h-10 w-10 items-center justify-center rounded-lg border border-gray-300 hover:bg-gray-50">
+                onClick={() => {
+                  const maxStock = product.stock || 0;
+                  if (quantity < maxStock) {
+                    setQuantity(quantity + 1);
+                  }
+                }}
+                disabled={quantity >= (product.stock || 0)}
+                className="flex h-10 w-10 items-center justify-center rounded-lg border border-gray-300 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">
                 <Plus className="h-4 w-4" />
               </button>
             </div>
           </div>
 
           {/* Action Buttons */}
-          <div className="flex flex-col gap-4 sm:flex-row">
-            <Button onClick={handleAddToCart} className="flex-1" size="lg">
-              Add to Cart
+          <div className="flex flex-col gap-3 sm:flex-row">
+            <Button 
+              onClick={handleAddToCart} 
+              className="flex-1 py-4 text-base font-semibold" 
+              size="lg"
+              disabled={!product.stock || product.stock <= 0}
+            >
+              {!product.stock || product.stock <= 0 ? "Out of Stock" : "Add to Cart"}
             </Button>
-            <Button variant="outline" size="lg">
+            <Button variant="outline" className="py-6 text-base font-semibold" size="lg">
               <Heart className="mr-2 h-5 w-5" />
               Add to Wishlist
             </Button>
