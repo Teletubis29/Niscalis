@@ -135,12 +135,12 @@ export default function Navigation() {
                     <div className="text-muted-foreground">Get in touch with our team for any inquiries.</div>
                   </Link>
                 </NavigationMenuLink>
-                <NavigationMenuLink asChild>
+                {/* <NavigationMenuLink asChild>
                   <Link href="#">
                     <div className="font-medium">Blog</div>
                     <div className="text-muted-foreground">Get inspired by our latest posts.</div>
                   </Link>
-                </NavigationMenuLink>
+                </NavigationMenuLink> */}
               </li>
             </ul>
           </NavigationMenuContent>

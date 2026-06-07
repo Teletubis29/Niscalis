@@ -108,9 +108,9 @@ export default function CartPage() {
                 <div className="flex-1">
                   <p className="font-semibold text-red-900">{stock?.name}</p>
                   <p className="text-sm text-red-800">
-                    Quantity di cart Anda adalah {item.quantity}, tetapi stock hanya tersedia
-                    {stock && stock.stock > 0 ? ` ${stock.stock} unit` : " 0 unit (out of stock)"}.
-                    Silakan kurangi quantity untuk melanjutkan checkout.
+                    Quantity {item.quantity}, but only
+                    {stock && stock.stock > 0 ? ` ${stock.stock} units` : " 0 units (out of stock)"} are available.
+                    Please reduce the quantity to proceed with checkout.
                   </p>
                 </div>
               </div>
@@ -124,65 +124,138 @@ export default function CartPage() {
           {items.map((item) => {
             const stock = productStocks.get(item.id);
             const exceedsStock = stock && item.quantity > stock.stock;
+            const isOutOfStock = stock && stock.stock === 0;
 
             return (
               <div
                 key={item.id}
-                className={`flex items-center space-x-4 p-6 ${
+                className={`flex flex-col gap-4 p-4 sm:flex-row sm:items-center sm:space-x-4 sm:p-6 ${
                   exceedsStock ? "bg-red-50" : ""
                 }`}>
+                {/* Image */}
                 <img
                   src={item.image || "/placeholder.svg"}
                   alt={item.name}
-                  className="h-20 w-20 rounded-lg object-cover"
+                  className="h-24 w-24 rounded-lg object-cover sm:h-20 sm:w-20"
                 />
 
+                {/* Product Details */}
                 <div className="flex-1">
                   <h3 className="font-semibold text-gray-900">{item.name}</h3>
-                  <p className="text-muted-foreground">{formatRupiah(item.price)}</p>
+                  <p className="text-muted-foreground text-sm sm:text-base">{formatRupiah(item.price)}</p>
                   {stock && (
-                    <p className={`text-sm ${exceedsStock ? "text-red-600" : "text-green-600"}`}>
-                      Stock tersedia: {stock.stock}
+                    <p className={`text-sm ${isOutOfStock ? "text-red-600 font-semibold" : exceedsStock ? "text-red-600" : "text-green-600"}`}>
+                      {isOutOfStock ? "Out of Stock" : `Stock available: ${stock.stock}`}
                     </p>
                   )}
                 </div>
 
-                <div className="flex items-center space-x-3">
+                {/* Quantity Controls & Price - Desktop */}
+                <div className="hidden sm:flex sm:items-center sm:space-x-3">
                   <button
-                    onClick={() => updateQuantity(item.id, Math.max(0, item.quantity - 1))}
-                    className="flex h-8 w-8 items-center justify-center rounded-lg border border-gray-300 hover:bg-gray-50">
-                    <Minus className="h-4 w-4" />
+                    onClick={() => {
+                      if (item.quantity > 1) {
+                        const result = updateQuantity(item.id, item.quantity - 1);
+                        if (!result.success) {
+                          setAlertState({
+                            title: "Cannot Update Quantity",
+                            message: result.message || "Failed to update quantity"
+                          });
+                          setTimeout(() => setAlertState(null), 3000);
+                        }
+                      }
+                    }}
+                    disabled={item.quantity <= 1}
+                    className="flex h-8 w-8 items-center justify-center rounded-lg border border-gray-300 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50">
+                    <Minus className="h-4 w-4 cursor-pointer" />
                   </button>
                   <span className="w-8 text-center font-semibold">{item.quantity}</span>
                   <button
                     onClick={() => {
                       const newQuantity = item.quantity + 1;
-                      if (stock && newQuantity > stock.stock) {
+                      const result = updateQuantity(item.id, newQuantity);
+                      if (!result.success) {
                         setAlertState({
                           title: "Stock Limit Reached",
-                          message: `Tidak dapat menambah! Stock hanya tersedia ${stock.stock} unit.`
+                          message: result.message || `Cannot add more! Stock is insufficient.`
                         });
                         setTimeout(() => setAlertState(null), 3000);
-                        return;
                       }
-                      updateQuantity(item.id, newQuantity);
                     }}
-                    className="flex h-8 w-8 items-center justify-center rounded-lg border border-gray-300 hover:bg-gray-50">
-                    <Plus className="h-4 w-4" />
+                    disabled={isOutOfStock}
+                    className="flex h-8 w-8 items-center justify-center rounded-lg border border-gray-300 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50">
+                    <Plus className="h-4 w-4 cursor-pointer" />
                   </button>
                 </div>
 
-                <div className="text-right">
+                {/* Price - Desktop */}
+                <div className="hidden sm:flex sm:flex-col sm:text-right sm:min-w-[120px]">
                   <p className="font-semibold text-gray-900">
                     {formatRupiah(item.price * item.quantity)}
                   </p>
                 </div>
 
+                {/* Delete Button - Desktop */}
                 <button
                   onClick={() => removeItem(item.id)}
-                  className="p-2 text-red-500 hover:text-red-700">
+                  className="hidden sm:flex sm:p-2 text-red-500 hover:text-red-700 cursor-pointer">
                   <Trash2 className="h-5 w-5" />
                 </button>
+
+                {/* Mobile Bottom Row - Quantity Controls & Actions */}
+                <div className="flex sm:hidden items-center justify-between gap-4 pt-4 border-t border-gray-200">
+                  {/* Quantity Section */}
+                  <div className="flex items-center space-x-2">
+                    <button
+                      onClick={() => {
+                        if (item.quantity > 1) {
+                          const result = updateQuantity(item.id, item.quantity - 1);
+                          if (!result.success) {
+                            setAlertState({
+                              title: "Cannot Update Quantity",
+                              message: result.message || "Failed to update quantity"
+                            });
+                            setTimeout(() => setAlertState(null), 3000);
+                          }
+                        }
+                      }}
+                      disabled={item.quantity <= 1}
+                      className="flex h-8 w-8 items-center justify-center rounded-lg border border-gray-300 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50">
+                      <Minus className="h-4 w-4" />
+                    </button>
+                    <span className="w-8 text-center font-semibold">{item.quantity}</span>
+                    <button
+                      onClick={() => {
+                        const newQuantity = item.quantity + 1;
+                        const result = updateQuantity(item.id, newQuantity);
+                        if (!result.success) {
+                          setAlertState({
+                            title: "Stock Limit Reached",
+                            message: result.message || `Cannot add more! Stock is insufficient.`
+                          });
+                          setTimeout(() => setAlertState(null), 3000);
+                        }
+                      }}
+                      disabled={isOutOfStock}
+                      className="flex h-8 w-8 items-center justify-center rounded-lg border border-gray-300 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50">
+                      <Plus className="h-4 w-4" />
+                    </button>
+                  </div>
+
+                  {/* Price & Delete Section */}
+                  <div className="flex items-center justify-end gap-4">
+                    <div className="text-right">
+                      <p className="font-semibold text-gray-900">
+                        {formatRupiah(item.price * item.quantity)}
+                      </p>
+                    </div>
+                    <button
+                      onClick={() => removeItem(item.id)}
+                      className="p-2 text-red-500 hover:text-red-700">
+                      <Trash2 className="h-5 w-5" />
+                    </button>
+                  </div>
+                </div>
               </div>
             );
           })}

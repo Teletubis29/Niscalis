@@ -6,6 +6,7 @@ import { useCartStore } from "@/stores/cartStore";
 import type { Product } from "@/lib/schemas";
 import { Button } from "@/components/ui/button";
 import { formatRupiah } from "@/lib/utils";
+import { toast } from "sonner";
 
 interface ProductCardProps {
   product: Product;
@@ -18,13 +19,21 @@ export default function ProductCard({ product, basePath = "/shopping" }: Product
   const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    addItem({
+    
+    const result = addItem({
       id: product.id,
       name: product.name,
       price: product.price,
       image: product.image,
-      quantity: 1
+      quantity: 1,
+      stock: product.stock as number | undefined,
     });
+
+    if (result.success) {
+      toast.success(result.message || "Added to cart");
+    } else {
+      toast.error(result.message || "Failed to add to cart");
+    }
   };
 
   return (

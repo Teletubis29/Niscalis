@@ -61,15 +61,27 @@ export default function CheckoutPage() {
             {/* Contact Information */}
             <div>
               <h2 className="mb-4 text-xl font-semibold text-gray-900">Contact Information</h2>
-              <div>
-                <Input
-                  type="email"
-                  placeholder="Email address"
-                  value={data.email || ""}
-                  onChange={(e) => setValue("email", e.target.value)}
-                  className={errors.email ? "border-red-500" : ""}
-                />
-                {errors.email && <p className="mt-1 text-sm text-red-600">{errors.email}</p>}
+              <div className="space-y-4">
+                <div>
+                  <Input
+                    type="email"
+                    placeholder="Email address"
+                    value={data.email || ""}
+                    onChange={(e) => setValue("email", e.target.value)}
+                    className={errors.email ? "border-red-500" : ""}
+                  />
+                  {errors.email && <p className="mt-1 text-sm text-red-600">{errors.email}</p>}
+                </div>
+                <div>
+                  <Input
+                    type="tel"
+                    placeholder="Phone Number"
+                    value={data.phoneNumber || ""}
+                    onChange={(e) => setValue("phoneNumber", e.target.value)}
+                    className={errors.phoneNumber ? "border-red-500" : ""}
+                  />
+                  {errors.phoneNumber && <p className="mt-1 text-sm text-red-600">{errors.phoneNumber}</p>}
+                </div>
               </div>
             </div>
 
@@ -146,8 +158,22 @@ export default function CheckoutPage() {
               </div>
             </div>
 
-            {/* Payment Information */}
+            {/* Order Notes */}
             <div>
+              <h2 className="mb-4 text-xl font-semibold text-gray-900">Order Notes</h2>
+              <div>
+                <textarea
+                  placeholder="Add any special instructions or notes for your order (optional)"
+                  value={data.orderNotes || ""}
+                  onChange={(e) => setValue("orderNotes", e.target.value)}
+                  className="min-h-24 w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+                />
+                {errors.orderNotes && <p className="mt-1 text-sm text-red-600">{errors.orderNotes}</p>}
+              </div>
+            </div>
+
+            {/* Payment Information */}
+            {/* <div>
               <h2 className="mb-4 text-xl font-semibold text-gray-900">Payment Information</h2>
               <div className="space-y-4">
                 <div>
@@ -187,7 +213,7 @@ export default function CheckoutPage() {
                   </div>
                 </div>
               </div>
-            </div>
+            </div> */}
 
             <Button type="submit" className="w-full" size="lg" disabled={isSubmitting}>
               {isSubmitting ? "Processing..." : "Place Order"}

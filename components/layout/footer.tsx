@@ -2,19 +2,63 @@
 
 import { usePathname } from "next/navigation";
 import Link from "next/link";
+import { useState } from "react";
 import { FaFacebookF, FaInstagram, FaTiktok } from "react-icons/fa";
 import { BsThreads, BsEnvelope } from "react-icons/bs";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import Logo from "@/components/logo";
+import { toast } from "sonner";
+import { apiPost } from "@/lib/api";
 
 export default function Footer() {
   const pathname = usePathname();
+  const [email, setEmail] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
   // Don't render footer on admin pages
   if (pathname.startsWith("/admin")) {
     return null;
   }
+
+  const handleSubscribe = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    // Validation
+    if (!email) {
+      toast.error("Please enter your email");
+      return;
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      toast.error("Please enter a valid email address");
+      return;
+    }
+
+    try {
+      setIsLoading(true);
+
+      const response = await apiPost("/api/contact", {
+        name: "Newsletter Subscriber",
+        email,
+        subject: "Newsletter Subscription",
+        message: "User subscribed to the newsletter",
+      });
+
+      if (response.error) {
+        throw new Error(response.error);
+      }
+
+      toast.success("Successfully subscribed to newsletter!");
+      setEmail("");
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Failed to subscribe");
+      console.error("Newsletter subscription error:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   return (
     <footer className="border-t">
@@ -36,10 +80,19 @@ export default function Footer() {
               <h3 className="mb-3 text-sm font-semibold text-gray-900">
                 Subscribe to our newsletter
               </h3>
-              <div className="flex space-x-2">
-                <Input type="email" placeholder="Enter your email" className="flex-1" />
-                <Button>Subscribe</Button>
-              </div>
+              <form onSubmit={handleSubscribe} className="flex space-x-2">
+                <Input
+                  type="email"
+                  placeholder="Enter your email"
+                  className="flex-1"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  disabled={isLoading}
+                />
+                <Button type="submit" disabled={isLoading}>
+                  {isLoading ? "Subscribing..." : "Subscribe"}
+                </Button>
+              </form>
             </div>
 
             {/* Social Links */}

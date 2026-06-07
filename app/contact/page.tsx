@@ -116,7 +116,7 @@ export default function ContactPage() {
                 <div>
                   <h3 className="mb-1 font-semibold text-gray-900">Email</h3>
                   <p className="text-muted-foreground">
-                    Support: niscalis.official@gmail.com  
+                    niscalis.official@gmail.com  
                   </p>
                 </div>
               </div>

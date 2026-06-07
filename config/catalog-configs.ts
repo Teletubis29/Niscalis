@@ -1,9 +1,10 @@
 export interface FilterConfig {
   id: string;
-  type: "category" | "price" | "custom";
+  type: "category" | "price" | "custom" | "search";
   label: string;
   defaultValue?: any;
   options?: Array<{ label: string; value: string }>;
+  placeholder?: string;
 }
 
 export interface CatalogConfig {
@@ -34,19 +35,22 @@ export const SHOPPING_CONFIG: CatalogConfig = {
   headerTextColor: "text-green-50",
   detailPathPrefix: "/shopping",
   colorClass: "green",
-  backgroundImage: "https://media.istockphoto.com/id/1067203316/id/foto/wanita-memegang-keranjang-belanja-dengan-latar-belakang-lorong-supermarket-blur-abstrak.jpg?s=2048x2048&w=is&k=20&c=PkZK0e17YraJfrntSl0bOzvtSZRW82IMP8jsFRANJSQ=",
+  // backgroundImage: "https://media.istockphoto.com/id/1067203316/id/foto/wanita-memegang-keranjang-belanja-dengan-latar-belakang-lorong-supermarket-blur-abstrak.jpg?s=2048x2048&w=is&k=20&c=PkZK0e17YraJfrntSl0bOzvtSZRW82IMP8jsFRANJSQ=",
+  backgroundImage: "https://media.istockphoto.com/id/2230023160/id/foto/pengusaha-yang-bekerja-di-komputer-untuk-dijual-atau-distribusi-produk.jpg?s=2048x2048&w=is&k=20&c=i_9KreZdKOukqaOSCK9IojYLdTXdFG_2ZEsfUeRMKLo=",
   filters: [
+    {
+      id: "search",
+      type: "search",
+      label: "Search Products",
+      defaultValue: "",
+      placeholder: "Search product",
+    },
     {
       id: "category",
       type: "category",
       label: "Category",
       defaultValue: "all",
-      options: [
-        { label: "All Products", value: "all" },
-        { label: "Audio", value: "audio" },
-        { label: "Wearables", value: "wearables" },
-        { label: "Accessories", value: "accessories" },
-      ],
+      // Categories will be dynamically fetched from database
     },
     {
       id: "price",
@@ -79,6 +83,13 @@ export const PROPERTY_CONFIG: CatalogConfig = {
   backgroundImage: "https://media.istockphoto.com/id/1486160447/id/foto/closeup-baru-bangunan-apartemen-modern-latar-belakang-dengan-ruang-fotokopi.jpg?s=2048x2048&w=is&k=20&c=wH1171InEtvsijA5ulIeaxFiDgvV-m_HlItSXDVkIJA=",
   filters: [
     {
+      id: "search",
+      type: "search",
+      label: "Search Properties",
+      defaultValue: "",
+      placeholder: "Search property",
+    },
+    {
       id: "propertyType",
       type: "category",
       label: "Transaction Type",
@@ -95,13 +106,7 @@ export const PROPERTY_CONFIG: CatalogConfig = {
       type: "category",
       label: "Property Type",
       defaultValue: "all",
-      options: [
-        { label: "All Properties", value: "all" },
-        { label: "House", value: "rumah" },
-        { label: "Apartment", value: "apartemen" },
-        { label: "Shop", value: "ruko" },
-        { label: "Land", value: "tanah" },
-      ],
+      // Categories will be dynamically fetched from database
     },
       {
       id: "areas",

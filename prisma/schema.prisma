@@ -86,7 +86,7 @@ model Property {
   area            Float?   // Luas bangunan dalam m2
   landArea        Float?   // Luas tanah dalam m2
   yearBuilt       Int?
-  condition       String?  // "baru", "renovasi", "standart"
+  condition       String?  // "new", "renovated", "standard"
   features        String[] // Array fitur: ["AC", "Kolam Renang", dll]
   rating          Float?
   reviews         Int      @default(0)

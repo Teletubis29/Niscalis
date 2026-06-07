@@ -70,19 +70,20 @@ export default function ProductDetailPage({ product, relatedProducts }: Props) {
       return;
     }
     
-    addItem({
+    const result = addItem({
       id: String(product.id),
       name: product.name,
       price: product.price,
       image: product.image || "/placeholder.svg",
-      quantity: quantity
+      quantity: quantity,
+      stock: product.stock,
     });
 
-    // Show success message
+    // Show result message
     setAlertState({
-      title: "Added to Cart",
-      message: `${product.name} berhasil ditambahkan ke cart`,
-      variant: "default"
+      title: result.success ? "Added to Cart" : "Failed to Add",
+      message: result.message || (result.success ? `${product.name} berhasil ditambahkan ke cart` : "Failed to add to cart"),
+      variant: result.success ? "default" : "destructive"
     });
   };
 

@@ -31,7 +31,8 @@ export default function Hero() {
             <div className="aspect-square overflow-hidden rounded-2xl">
               <img
                 // src="https://images.unsplash.com/photo-1511892549826-a48122d9b258?q=80&w=1171&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
-                src="/test-12.jpeg"
+                // src="/test-12.jpeg"
+                src="https://images.unsplash.com/photo-1574634534894-89d7576c8259?q=80&w=764&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
                 alt="Hero Product"
                 className="h-full w-full object-cover"
               />

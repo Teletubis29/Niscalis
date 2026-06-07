@@ -1,9 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import { Star, Heart, MapPin, Bed, Bath, ParkingCircle, Ruler, AlertCircle, Minus, Plus } from "lucide-react";
+import { Star, Heart, MapPin, Bed, Bath, ParkingCircle, Ruler, AlertCircle, MessageCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useCartStore } from "@/stores/cartStore";
 import ProductCard from "@/components/ProductCard";
 import ThumbnailGallery from "@/components/ThumbnailGallery";
 import { formatRupiah } from "@/lib/utils";
@@ -12,6 +10,7 @@ interface Property {
   id: number;
   name: string;
   price: number;
+  stock?: number;
   image: string | null;
   thumbnails?: string;
   description: string | null;
@@ -33,17 +32,13 @@ interface Property {
 type Props = { property: Property; relatedProperties: Property[] };
 
 export default function PropertiesDetailPage({ property, relatedProperties }: Props) {
-  const [quantity, setQuantity] = useState(1);
-  const addItem = useCartStore((state) => state.addItem);
-
-  const handleAddToCart = () => {
-    addItem({
-      id: String(property.id),
-      name: property.name,
-      price: property.price,
-      image: property.image || "/placeholder.svg",
-      quantity: quantity
-    });
+  const handleContactAgent = () => {
+    // Format WhatsApp message dengan detail properti
+    const message = `Halo, saya tertarik dengan properti *${property.name}* di ${property.location}\n\nHarga: ${formatRupiah(property.price)}\n\nBisa info lebih lanjut dan jadwal kunjungan?`;
+    const encodedMessage = encodeURIComponent(message);
+    // Ganti dengan nomor WhatsApp agent yang sebenarnya
+    const whatsappUrl = `https://wa.me/62851234567?text=${encodedMessage}`;
+    window.open(whatsappUrl, "_blank");
   };
 
   // Parse thumbnails from JSON string
@@ -108,7 +103,7 @@ export default function PropertiesDetailPage({ property, relatedProperties }: Pr
             </div>
             {property.condition && (
               <div className="text-sm text-gray-600">
-                <span className="font-semibold">Kondisi: </span>{property.condition}
+                <span className="font-semibold">Status : </span>{property.condition}
               </div>
             )}
           </div>
@@ -174,28 +169,13 @@ export default function PropertiesDetailPage({ property, relatedProperties }: Pr
             </div>
           )}
 
-          {/* Quantity */}
-          <div>
-            <h3 className="mb-3 font-semibold text-gray-900">Quantity</h3>
-            <div className="flex items-center space-x-3">
-              <button
-                onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                className="flex h-10 w-10 items-center justify-center rounded-lg border border-gray-300 hover:bg-gray-50">
-                <Minus className="h-4 w-4" />
-              </button>
-              <span className="w-12 text-center font-semibold">{quantity}</span>
-              <button
-                onClick={() => setQuantity(quantity + 1)}
-                className="flex h-10 w-10 items-center justify-center rounded-lg border border-gray-300 hover:bg-gray-50">
-                <Plus className="h-4 w-4" />
-              </button>
-            </div>
-          </div>
+
 
           {/* Action Buttons */}
           <div className="space-y-3 pt-4 border-t border-gray-200">
-            <Button size="lg" onClick={handleAddToCart} className="w-full text-white" style={{ backgroundColor: '#1e3a5f' }} onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#162d47'} onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#1e3a5f'}>
-              Add to Cart
+            <Button size="lg" onClick={handleContactAgent} className="w-full text-white" style={{ backgroundColor: '#1e3a5f' }} onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#16324a'} onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#1e3a5f'}>
+              <MessageCircle className="mr-2 h-4 w-4" />
+              Direct Agent via WhatsApp
             </Button>
             <Button variant="outline" size="lg" className="w-full">
               <Heart className="mr-2 h-4 w-4" />
@@ -207,8 +187,8 @@ export default function PropertiesDetailPage({ property, relatedProperties }: Pr
           <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-lg flex items-start space-x-3">
             <AlertCircle className="w-5 h-5 text-yellow-600 flex-shrink-0 mt-0.5" />
             <div className="text-sm text-yellow-800">
-              <p className="font-semibold mb-1">Informasi Penting</p>
-              <p>Verifikasi data properti sebelum mengambil keputusan. Hubungi penjual untuk detail lebih lanjut.</p>
+              <p className="font-semibold mb-1">Important Information</p>
+              <p>Verify property data before making a decision. Contact the seller for more details.</p>
             </div>
           </div>
         </div>

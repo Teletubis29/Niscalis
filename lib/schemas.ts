@@ -12,6 +12,8 @@ export const ProductSchema = z.object({
   category: z.string().optional(),
   badge: z.string().optional(),
   description: z.string().optional(),
+  stock: z.number().min(0).optional(), // Product stock quantity
+  createdAt: z.string().optional(), // For sorting by newest
   images: z.array(z.string()).optional(),
   colors: z
     .array(
@@ -43,6 +45,7 @@ export const CartItemSchema = z.object({
   price: z.number().positive(),
   image: z.string(),
   quantity: z.number().min(1),
+  stock: z.number().min(0).optional(), // Stock quantity available
 })
 
 // User schema
@@ -87,12 +90,14 @@ export const ForgotPasswordSchema = z.object({
 // Checkout form schema
 export const CheckoutSchema = z.object({
   email: z.string().email("Please enter a valid email address"),
+  phoneNumber: z.string().min(10, "Phone number must be at least 10 characters"),
   firstName: z.string().min(1, "First name is required"),
   lastName: z.string().min(1, "Last name is required"),
   address: z.string().min(1, "Address is required"),
   city: z.string().min(1, "City is required"),
   state: z.string().min(1, "State is required"),
   zipCode: z.string().min(5, "ZIP code must be at least 5 characters"),
+  orderNotes: z.string().optional(),
   cardNumber: z.string().min(16, "Card number must be at least 16 digits"),
   expiryDate: z.string().regex(/^\d{2}\/\d{2}$/, "Please enter MM/YY format"),
   cvv: z.string().min(3, "CVV must be at least 3 digits"),

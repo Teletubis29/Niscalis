@@ -321,8 +321,8 @@ export default function PropertyForm({ initialData, isLoading = false }: Propert
                     <SelectValue placeholder="Select status" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="jual">For Sale</SelectItem>
-                    <SelectItem value="sewa">For Rent</SelectItem>
+                    <SelectItem value="Sale">For Sale</SelectItem>
+                    <SelectItem value="Rent">For Rent</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -334,9 +334,9 @@ export default function PropertyForm({ initialData, isLoading = false }: Propert
                     <SelectValue placeholder="Select condition" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="baru">New</SelectItem>
-                    <SelectItem value="renovasi">Renovated</SelectItem>
-                    <SelectItem value="standart">Standard</SelectItem>
+                    <SelectItem value="New">New</SelectItem>
+                    <SelectItem value="Renovated">Renovated</SelectItem>
+                    <SelectItem value="Standard">Standard</SelectItem>
                   </SelectContent>
                 </Select>
               </div>

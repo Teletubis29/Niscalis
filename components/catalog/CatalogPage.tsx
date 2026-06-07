@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { ChevronDown, Filter, X } from "lucide-react";
+import { ChevronDown, Filter, X, Search } from "lucide-react";
 import ProductCard from "@/components/ProductCard";
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
@@ -22,6 +22,7 @@ export default function CatalogPage({ catalogConfig }: CatalogPageProps) {
   const [error, setError] = useState<string | null>(null);
   const [showFilters, setShowFilters] = useState(false);
   const [sortBy, setSortBy] = useState("featured");
+  const [dynamicCategories, setDynamicCategories] = useState<Array<{ label: string; value: string }>>([]);
 
   // Dynamic state for filters
   const [filterState, setFilterState] = useState<Record<string, any>>(() => {
@@ -66,6 +67,26 @@ export default function CatalogPage({ catalogConfig }: CatalogPageProps) {
     fetchItems();
   }, [catalogConfig.apiEndpoint]);
 
+  // Extract unique categories from items
+  useEffect(() => {
+    if (items.length > 0) {
+      const uniqueCategories = Array.from(
+        new Map(
+          Array.from(new Set(items.map((item) => item.category).filter(Boolean)))
+            .map((category) => [
+              category,
+              {
+                label: (category as string).charAt(0).toUpperCase() + (category as string).slice(1),
+                value: category as string,
+              },
+            ])
+        ).values()
+      );
+      
+      setDynamicCategories(uniqueCategories);
+    }
+  }, [items]);
+
   // Get price filter config
   const priceFilter = catalogConfig.filters.find((f) => f.id === "price");
   const categoryFilter = catalogConfig.filters.find((f) => f.id === "category");
@@ -86,6 +107,14 @@ export default function CatalogPage({ catalogConfig }: CatalogPageProps) {
 
   // Dynamic filtering
   const filteredItems = items
+    .filter((item) => {
+      // Search filter
+      const searchValue = filterState["search"]?.toLowerCase() || "";
+      if (searchValue) {
+        return item.name.toLowerCase().includes(searchValue);
+      }
+      return true;
+    })
     .filter((item) => {
       // Property Type filter (jual/sewa) - only for properties
       const propertyTypeValue = filterState["propertyType"];
@@ -114,6 +143,13 @@ export default function CatalogPage({ catalogConfig }: CatalogPageProps) {
       if (sortBy === "price-low") return a.price - b.price;
       if (sortBy === "price-high") return b.price - a.price;
       if (sortBy === "rating") return (b.rating || 0) - (a.rating || 0);
+      if (sortBy === "newest") {
+        // Sort by createdAt date if available, newest first
+        const dateA = new Date((a as any).createdAt || 0).getTime();
+        const dateB = new Date((b as any).createdAt || 0).getTime();
+        return dateB - dateA;
+      }
+      // "featured" - keep original order (no sort)
       return 0;
     });
 
@@ -211,10 +247,16 @@ export default function CatalogPage({ catalogConfig }: CatalogPageProps) {
                 disabled={!isFilterActive}>
                 Reset Filters
               </button>
+          
 
               {/* Dynamic Filters */}
               {catalogConfig.filters.map((filter) => {
                 if (filter.type === "category") {
+                  // Use dynamic categories for "category" filter, otherwise use config options
+                  const categoryOptions = filter.id === "category" && dynamicCategories.length > 0
+                    ? dynamicCategories
+                    : filter.options || [];
+                  
                   return (
                     <div key={filter.id}>
                       <h3 className="mb-3 text-xs tracking-widest uppercase">
@@ -225,13 +267,34 @@ export default function CatalogPage({ catalogConfig }: CatalogPageProps) {
                           value={filterState[filter.id]}
                           onChange={(e) => handleFilterChange(filter.id, e.target.value)}
                           className="focus:ring-primary w-full appearance-none rounded-lg border border-gray-300 bg-white px-4 py-2 pr-8 transition-colors focus:border-transparent focus:ring-2">
-                          {filter.options?.map((option) => (
+                          <option value="all">All {filter.label}</option>
+                          {categoryOptions.map((option) => (
                             <option key={option.value} value={option.value}>
                               {option.label}
                             </option>
                           ))}
                         </select>
                         <ChevronDown className="pointer-events-none absolute top-1/2 right-2 h-4 w-4 -translate-y-1/2 transform text-gray-400" />
+                      </div>
+                    </div>
+                  );
+                }
+
+                if (filter.type === "search") {
+                  return (
+                    <div key={filter.id}>
+                      <h3 className="mb-3 text-xs tracking-widest uppercase">
+                        {filter.label}
+                      </h3>
+                      <div className="relative">
+                        <Search className="pointer-events-none absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 transform text-gray-400" />
+                        <input
+                          type="text"
+                          placeholder={filter.placeholder || "Search..."}
+                          value={filterState[filter.id]}
+                          onChange={(e) => handleFilterChange(filter.id, e.target.value)}
+                          className="focus:ring-primary w-full rounded-lg border border-gray-300 bg-white py-2 pl-10 pr-4 text-sm transition-colors focus:border-transparent focus:ring-2"
+                        />
                       </div>
                     </div>
                   );
