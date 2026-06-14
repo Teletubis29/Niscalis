@@ -24,14 +24,19 @@ model User {
 model Product {
   id          Int      @id @default(autoincrement())
   name        String
+  slug        String?  // SEO-friendly URL (auto-generated from name)
+  sku         String?  // Stock Keeping Unit (auto-generated)
   description String?
   price       Float
+  discount    Float?   @default(0) // Discount percentage (0-100)
   stock       Int      @default(0)
   image       String?
   thumbnails  String   @default("[]") // JSON array of image URLs
   category    String?
   rating      Float?
   reviews     Int      @default(0)
+  isFeatured  Boolean  @default(false) // Show in featured section
+  isNew       Boolean  @default(false) // Show as new product
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
   orderItems  OrderItem[]

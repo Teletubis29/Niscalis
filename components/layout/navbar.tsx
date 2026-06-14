@@ -3,12 +3,14 @@
 import { useState, useEffect } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import Link from "next/link";
-import { ShoppingCart, User, Menu, X, Search } from "lucide-react";
+import { ShoppingCart, Heart, User, Menu, X } from "lucide-react";
 import { useCartStore } from "@/stores/cartStore";
+import { useFavoriteStore } from "@/stores/favoriteStore";
 import { useSession, signOut } from "next-auth/react";
 import Image from "next/image";
 import Navigation from "@/components/layout/navigation";
 import Logo from "@/components/logo";
+import SearchAutoSuggest from "@/components/SearchAutoSuggest";
 
 export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -16,6 +18,7 @@ export default function Navbar() {
   const pathname = usePathname();
   const router = useRouter();
   const itemCount = useCartStore((state) => state.getItemCount());
+  const favoriteCount = useFavoriteStore((state) => state.getItemCount());
   const { data: session } = useSession();
   const user = session?.user;
 
@@ -73,18 +76,21 @@ export default function Navbar() {
 
           {/* Search Bar */}    
           <div className="mx-8 hidden max-w-xs flex-1 items-center md:flex">
-            <div className="relative w-full">
-              <Search className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 transform text-gray-400" />
-              <input
-                type="text"
-                placeholder="Search products..."
-                className="focus:ring-primary w-full rounded-lg border border-gray-300 py-2 pr-4 pl-10 focus:border-transparent focus:ring-2"
-              />
-            </div>
+            <SearchAutoSuggest />
           </div>
 
           {/* Right Side */}
           <div className="flex items-center space-x-4">
+            {/* Favorites */}
+            <Link href="/favorites" className="relative">
+              <Heart className="hover:text-primary h-6 w-6 text-gray-700 transition-colors" />
+              {isMounted && favoriteCount > 0 && (
+                <span className="bg-red-500 absolute -top-2 -right-2 flex h-5 w-5 items-center justify-center rounded-full text-xs text-white">
+                  {favoriteCount}
+                </span>
+              )}
+            </Link>
+
             {/* Cart */}
             <Link href="/cart" className="relative">
               <ShoppingCart className="hover:text-primary h-6 w-6 text-gray-700 transition-colors" />

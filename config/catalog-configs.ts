@@ -96,8 +96,8 @@ export const PROPERTY_CONFIG: CatalogConfig = {
       defaultValue: "all",
       options: [
         { label: "All", value: "all" },
-        { label: "For Sale", value: "jual" },
-        { label: "For Rent", value: "sewa" },
+        { label: "For Sale", value: "Sale" },
+        { label: "For Rent", value: "Rent" },
         // { label: "Buy", value: "buy" },
       ],
     },

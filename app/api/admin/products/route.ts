@@ -31,7 +31,22 @@ export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
 
-    const { name, description, price, image, stock, category, rating, reviews, thumbnails } = body;
+    const { 
+      name, 
+      slug,
+      sku,
+      description, 
+      price, 
+      discount,
+      image, 
+      stock, 
+      category, 
+      rating, 
+      reviews, 
+      thumbnails,
+      isFeatured,
+      isNew
+    } = body;
 
     if (!name || price === undefined) {
       return NextResponse.json(
@@ -43,14 +58,19 @@ export async function POST(request: NextRequest) {
     const product = await prisma.product.create({
       data: {
         name,
+        slug: slug || name.toLowerCase().replace(/\s+/g, '-'),
+        sku: sku || `SKU-${Date.now()}`,
         description: description || null,
         price: parseFloat(price),
+        discount: discount && parseFloat(discount) > 0 ? parseFloat(discount) : null,
         image: image || null,
         stock: stock ? parseInt(stock) : 0,
         category: category || null,
-        rating: rating || null,
+        rating: rating ? parseFloat(rating) : null,
         reviews: reviews || 0,
         thumbnails: thumbnails || "[]",
+        isFeatured: isFeatured || false,
+        isNew: isNew || false,
       },
     });
 
