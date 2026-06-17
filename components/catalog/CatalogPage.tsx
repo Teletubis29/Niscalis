@@ -21,7 +21,7 @@ export default function CatalogPage({ catalogConfig }: CatalogPageProps) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [showFilters, setShowFilters] = useState(false);
-  const [sortBy, setSortBy] = useState("featured");
+  const [sortBy, setSortBy] = useState("all");
   const [dynamicCategories, setDynamicCategories] = useState<Array<{ label: string; value: string }>>([]);
 
   // Dynamic state for filters
@@ -139,6 +139,20 @@ export default function CatalogPage({ catalogConfig }: CatalogPageProps) {
       }
       return true;
     })
+    .filter((item) => {
+      // Featured filter - show only featured products when sortBy is "featured"
+      if (sortBy === "featured") {
+        return item.isFeatured === true;
+      }
+      return true;
+    })
+    .filter((item) => {
+      // Newest filter - show only new products when sortBy is "newest"
+      if (sortBy === "newest") {
+        return item.isNew === true;
+      }
+      return true;
+    })
     .sort((a, b) => {
       if (sortBy === "price-low") return a.price - b.price;
       if (sortBy === "price-high") return b.price - a.price;
@@ -149,7 +163,7 @@ export default function CatalogPage({ catalogConfig }: CatalogPageProps) {
         const dateB = new Date((b as any).createdAt || 0).getTime();
         return dateB - dateA;
       }
-      // "featured" - keep original order (no sort)
+      // "all" or "featured" - keep original order (no sort)
       return 0;
     });
 

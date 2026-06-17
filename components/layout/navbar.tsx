@@ -80,12 +80,12 @@ export default function Navbar() {
           </div>
 
           {/* Right Side */}
-          <div className="flex items-center space-x-4">
+          <div className="flex items-center space-x-5">
             {/* Favorites */}
             <Link href="/favorites" className="relative">
               <Heart className="hover:text-primary h-6 w-6 text-gray-700 transition-colors" />
               {isMounted && favoriteCount > 0 && (
-                <span className="bg-red-500 absolute -top-2 -right-2 flex h-5 w-5 items-center justify-center rounded-full text-xs text-white">
+                <span className="bg-primary absolute -top-2 -right-2 flex h-5 w-5 items-center justify-center rounded-full text-xs text-white">
                   {favoriteCount}
                 </span>
               )}

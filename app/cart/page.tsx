@@ -74,7 +74,7 @@ export default function CartPage() {
         <p className="text-muted-foreground mb-8">
           Looks like you haven&#39;t added anything to your cart yet.
         </p>
-        <Link href="/shopping">
+        <Link href="/">
           <Button size="lg">Continue Shopping</Button>
         </Link>
       </div>
@@ -268,7 +268,7 @@ export default function CartPage() {
           </div>
 
           <div className="flex flex-col gap-4 sm:flex-row">
-            <Link href="/shopping" className="flex-1">
+            <Link href="/" className="flex-1">
               <Button variant="outline" className="w-full bg-transparent">
                 Continue Shopping
               </Button>

@@ -20,7 +20,7 @@ export default function Hero() {
                   Shop Now
                 </Button>
               </Link>
-              <Link href="/about">
+              <Link href="/about-us">
                 <Button variant="outline" size="lg" className="w-full bg-transparent sm:w-auto">
                   Learn More
                 </Button>

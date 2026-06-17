@@ -60,6 +60,7 @@ export const SHOPPING_CONFIG: CatalogConfig = {
     },
   ],
   sortOptions: [
+    { value: "all", label: "All Products" },
     { value: "featured", label: "Featured" },
     { value: "newest", label: "Newest" },
     { value: "price-low", label: "Price: Low to High" },
@@ -133,6 +134,7 @@ export const PROPERTY_CONFIG: CatalogConfig = {
     },
   ],
   sortOptions: [
+    { value: "all", label: "All Properties" },
     { value: "featured", label: "Featured" },
     { value: "newest", label: "Newest" },
     { value: "price-low", label: "Price: Low to High" },
@@ -174,6 +176,7 @@ export const PHOTOGRAPHY_CONFIG: CatalogConfig = {
     },
   ],
   sortOptions: [
+    { value: "all", label: "Semua Fotografi" },
     { value: "featured", label: "Pilihan Terbaik" },
     { value: "newest", label: "Terbaru" },
     { value: "price-low", label: "Harga: Rendah ke Tinggi" },
